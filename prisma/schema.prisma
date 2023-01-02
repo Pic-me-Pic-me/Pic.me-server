@@ -13,4 +13,17 @@ model User {
   email         String? @db.VarChar(500)
   password      String? @db.VarChar(500)
   refresh_token String  @db.VarChar(500)
+  Vote          Vote?
+}
+
+model Vote {
+  vote_id      Int      @id @default(autoincrement())
+  user_id      Int
+  status       Boolean
+  title        String   @db.VarChar(25)
+  pictures     String   @db.VarChar(600)
+  count Int?
+  max_count Int?
+  created_at DateTime @default(now())
+  User         User     @relation(fields: [vote_id], references: [user_id], onDelete: Cascade, map: "user_id")
 }
