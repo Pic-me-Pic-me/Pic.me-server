@@ -16,7 +16,7 @@ const createVote= async(req: Request, res:Response) => {
     const data=await voteService.createVote(+userId, voteDTO);
 
     if(!data){
-        res.status(404).send("데이터 없었다...");
+        res.status(404).send("실패");
     }
     res.status(200).send("성공");
 }

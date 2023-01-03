@@ -20,25 +20,13 @@ const createVote= async(userId:number, voteDTO:VoteCreateDTO)=>{
 
     await createPictures(+data.vote_id, voteDTO.pictures[0]);
     await createPictures(+data.vote_id, voteDTO.pictures[1]);
-
-    // const updatedData= await prisma.vote.update({
-    //     where:{
-    //         vote_id: data.vote_id
-    //     },
-    //     data:{
-    //         pictures:picture
-    //     }
-    // });
-    // if(!updatedData)
-    //     return null;
-    // return updatedData;
+    
     return data;
 };
 
 const createPictures = async(voteId:number, pictureUrl:string) => {
     if(!voteId)
         return null;
-    console.log(voteId+","+pictureUrl);
     const data=await prisma.picture.create({
         data:{
             url:pictureUrl,
@@ -46,7 +34,6 @@ const createPictures = async(voteId:number, pictureUrl:string) => {
             vote_id:voteId
         }
     });
-    console.log("data:",data);
     return data.picture_id;
 }
 
