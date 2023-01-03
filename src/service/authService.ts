@@ -68,8 +68,30 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
     return user;
 };
 
+const signIn = async (userSignInDto: UserSignInDTO) => {
+    try {
+        const user = await chkByEmail(userSignInDto.email);
+        if (!user) return null;
+
+        const isMatch = await bcrypt.compare(userSignInDto.password, user.password!);
+        if (!isMatch) return sc.UNAUTHORIZED;
+
+        return user.user_id;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+const getEmailById = async (id: number) => {
+    const user = await findById(id);
+    return user?.user_name;
+}
+
 const authService = {
-    createUser
+    createUser,
+    signIn,
+    getEmailById
 };
 
 export default authService;
