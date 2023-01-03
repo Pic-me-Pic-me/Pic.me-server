@@ -1,8 +1,8 @@
-// import { Router } from "express";
-// import userRouter from "./userRouter";
+import { Router } from "express";
+import authRouter from "./authRouter";
 
-// const router: Router = Router();
+const router: Router = Router();
 
-// router.use("/user", userRouter);
+router.use("/auth", authRouter);
 
-// export default router;
+export default router;
