@@ -24,7 +24,6 @@ const createUser = async (req: Request, res: Response) => {
 
     const result = {
         id: data.user_id,
-        email: data.email,
         userName: data.user_name,
         refreshToken: data.refresh_token,
         accessToken,
