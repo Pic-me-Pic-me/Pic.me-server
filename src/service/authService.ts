@@ -1,31 +1,29 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
+import { sc } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
+import { UserSignInDTO } from "../interfaces/UserSignInDTO";
 import jwtHandler from "../modules/jwtHandler";
 
-const chkDuplicateByEmail = async (email: string) => {
+const chkByEmail = async (email: string) => {
     const user = await prisma.user.findFirst({
         where: {
             email: email
         },
     });
 
-    if (user) return true;
-
-    return false;
+    return user;
 }
 
-const chkDuplicateByUserName = async (username: string) => {
+const chkByUserName = async (username: string) => {
     const user = await prisma.user.findFirst({
         where: {
             user_name: username
         },
     });
 
-    if (user) return true;
-
-    return false;
+    return user;
 }
 
 const findById = async (id: number) => {
@@ -39,8 +37,8 @@ const findById = async (id: number) => {
 }
 
 const createUser = async (userCreateDto: UserCreateDTO) => {
-    if(await chkDuplicateByEmail(userCreateDto.email)) return null;
-    if(await chkDuplicateByUserName(userCreateDto?.username)) return null;
+    if((await chkByEmail(userCreateDto.email))) return null;
+    if((await chkByUserName(userCreateDto?.username))) return null;
 
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(userCreateDto.password, salt); 
