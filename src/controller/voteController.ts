@@ -12,7 +12,6 @@ const createVote= async(req: Request, res:Response) => {
         status:false,
         pictures:locations,
         count:0,
-        max_count:(+req.body.max_count),
     };
     const data=await voteService.createVote(+userId, voteDTO);
 
