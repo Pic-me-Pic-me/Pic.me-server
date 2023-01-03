@@ -24,7 +24,7 @@ model Vote {
   count      Int?
   created_at DateTime @default(now())
   max_count  Int?
-  pictures   String[] @db.VarChar(800)
+  pictures   String? @db.VarChar(800)
   Picture    Picture?
   User       User     @relation(fields: [vote_id], references: [user_id], onDelete: Cascade, map: "user_id")
 }
