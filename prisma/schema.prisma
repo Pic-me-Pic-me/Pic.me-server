@@ -17,13 +17,22 @@ model User {
 }
 
 model Vote {
-  vote_id      Int      @id @default(autoincrement())
-  user_id      Int
-  status       Boolean
-  title        String   @db.VarChar(25)
-  pictures     String   @db.VarChar(600)
-  count Int?
-  max_count Int?
+  vote_id    Int      @id @default(autoincrement())
+  user_id    Int
+  status     Boolean
+  title      String   @db.VarChar(25)
+  count      Int?
   created_at DateTime @default(now())
-  User         User     @relation(fields: [vote_id], references: [user_id], onDelete: Cascade, map: "user_id")
+  max_count  Int?
+  pictures   String[] @db.VarChar(800)
+  Picture    Picture?
+  User       User     @relation(fields: [vote_id], references: [user_id], onDelete: Cascade, map: "user_id")
+}
+
+model Picture {
+  picture_id Int    @id @unique @default(autoincrement())
+  url        String @db.VarChar(800)
+  count      Int
+  vote_id    Int
+  Vote       Vote   @relation(fields: [picture_id], references: [vote_id], onDelete: Cascade, map: "vote_id")
 }
