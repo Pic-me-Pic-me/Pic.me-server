@@ -61,8 +61,8 @@ const signInUser = async (req: Request, res: Response) => {
     } catch (e) {
         console.log(error);
         res
-            .status(sc.INTERNAL_SERVER_ERROR)
-            .send(fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR));
+          .status(sc.INTERNAL_SERVER_ERROR)
+          .send(fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR));
     }
 };
 
