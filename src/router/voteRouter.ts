@@ -1,8 +1,8 @@
-import {Router} from "express";
-import {voteController} from "../controller";
-import {upload} from "../middleware";
+import { Router } from "express";
+import { voteController } from "../controller";
+import { upload } from "../middlewares";
 
-const router: Router=Router();
+const router: Router = Router();
 
 router.post("/:userId", upload.array("file"), voteController.createVote);
 

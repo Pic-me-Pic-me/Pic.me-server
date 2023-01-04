@@ -20,10 +20,10 @@ const createUser = async (req: Request, res: Response) => {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.SIGNUP_FAIL));
     }
 
-    const accessToken = jwtHandler.sign(data.user_id);
+    const accessToken = jwtHandler.sign(data.id);
 
     const result = {
-        id: data.user_id,
+        id: data.id,
         userName: data.user_name,
         refreshToken: data.refresh_token,
         accessToken,
@@ -37,38 +37,35 @@ const signInUser = async (req: Request, res: Response) => {
     if (!error.isEmpty()) {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
     }
-  
+
     const userSignInDto: UserSignInDTO = req.body;
-  
+
     try {
         const data = await authService.signIn(userSignInDto);
-    
+
         if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_EMAIL));
-        else if (data === sc.UNAUTHORIZED)
-            return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_PASSWORD));
-    
+        else if (data === sc.UNAUTHORIZED) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_PASSWORD));
+
         const userName = await authService.getEmailById(data!);
 
         const accessToken = jwtHandler.sign(data);
-    
+
         const result = {
             id: data,
             userName: userName,
             accessToken,
         };
-    
+
         res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
     } catch (e) {
         console.log(error);
-        res
-          .status(sc.INTERNAL_SERVER_ERROR)
-          .send(fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR));
+        res.status(sc.INTERNAL_SERVER_ERROR).send(fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR));
     }
 };
 
 const authController = {
     createUser,
-    signInUser
+    signInUser,
 };
 
 export default authController;

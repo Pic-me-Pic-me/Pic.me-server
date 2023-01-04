@@ -1,5 +1,5 @@
-import { PictureCreateDTO } from './../interface/PictureCreateDTO';
-import { VoteCreateDTO } from './../interface/VoteCreateDTO';
+import { PictureCreateDTO } from './../interfaces/PictureCreateDTO';
+import { VoteCreateDTO } from './../interfaces/VoteCreateDTO';
 import {PrismaClient} from "@prisma/client";
 import { sc } from '../constants';
 
