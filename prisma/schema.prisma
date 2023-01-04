@@ -13,26 +13,24 @@ model User {
   email         String @db.VarChar(500)
   password      String @db.VarChar(500)
   refresh_token String @db.VarChar(500)
-  Vote          Vote?
-}
-
-model Picture {
-  picture_id Int    @id @unique @default(autoincrement())
-  url        String @db.VarChar(800)
-  count      Int
-  vote_id    Int
-  Vote       Vote   @relation(fields: [picture_id], references: [vote_id], onDelete: Cascade, map: "vote_id")
+  Vote          Vote[]
 }
 
 model Vote {
-  vote_id    Int      @id @default(autoincrement())
-  user_id    Int
-  status     Boolean
-  title      String   @db.VarChar(25)
+  vote_id Int       @id @default(autoincrement())
+  user_id Int
+  status  Boolean?
+  title   String    @db.VarChar(25)
+  created_at DateTime   @default(now())
+  count Int
+  Picture Picture[]
+  User    User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "vote_user_user_id_fk")
+}
+
+model Picture {
+  picture_id Int    @id @default(autoincrement())
+  vote_id    Int
+  url        String @db.VarChar(800)
   count      Int?
-  created_at DateTime @default(now())
-  max_count  Int?
-  pictures   String[] @db.VarChar(800)
-  Picture    Picture?
-  User       User     @relation(fields: [vote_id], references: [user_id], onDelete: Cascade, map: "user_id")
+  Vote       Vote   @relation(fields: [vote_id], references: [vote_id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
 }
