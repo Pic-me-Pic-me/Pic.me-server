@@ -4,6 +4,7 @@ import { authService } from "../service";
 import { rm, sc } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
+import { SocialUser } from "../interfaces/SocialUser";
 import { fail, success } from "../constants/response";
 import jwtHandler from "../modules/jwtHandler";
 
@@ -63,9 +64,34 @@ const signInUser = async (req: Request, res: Response) => {
     }
 };
 
+const getUser = async(req:Request, res:Response)=>{
+    const social=req.body.socialType;
+    const token=req.body.token;
+
+    if(!social || !token) //없는 경우
+        return;
+    const user=await authService.getUser(social, token);
+    //여기에 email, 카카오 userId가 있음
+
+        // 유저가 없는 경우 & 토큰이 유효하지않은 경우
+    if(!user)
+        return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NO_SOCIAL_USER));
+
+    //회원가입 했는지 확인하기 - id로 확인하기
+    const existUser=await authService.findByKey((user as SocialUser).userId, social);
+    
+    if(!existUser){ //id를 받는다. 
+        return await authService.createSocialUser((user as SocialUser).email!);
+    }
+
+    //있다면 새 토큰으로 발급해주고 업데이트
+    await authService.updateRefreshToken(existUser.id);
+};
+
 const authController = {
     createUser,
     signInUser,
+    getUser,
 };
 
 export default authController;
