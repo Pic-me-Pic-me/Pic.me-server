@@ -29,6 +29,12 @@ export default {
     VALID_TOKEN: "유효한 토큰입니다.",
     EMPTY_TOKEN: "토큰 값이 없습니다.",
   
+    // vote
+    CREATE_VOTE_SUCCESS:"투표 생성 성공",
+    CREATE_VOTE_FAIL: "투표 생성 실패",
+    CREATE_PICTURE_FAIL: "투표 내 사진 저장 실패",
+
+
     // server error
     INTERNAL_SERVER_ERROR: "서버 내 오류",
   };
