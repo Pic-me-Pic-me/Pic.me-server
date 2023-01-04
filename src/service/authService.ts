@@ -97,26 +97,36 @@ const getUser = async(socialType:string, token:string) => {
     return user;
 };
 
-const findByKey= async(userId: string, socialType:string) =>{
-    const user=await prisma.authentication_provider.findFirst({
+const findByKey= async(kakaoId: string, socialType:string) =>{
+    const auth=await prisma.authenticationProvider.findUnique({
         where:{
-            socialType:socialType,
-            id:userId
+            id:kakaoId.toString()
         }
-    }); //여기서 ... email도 받야야 함. 
-    return user.user_id;
+    }); 
+    if(!auth)
+        return null;
+    const user=await findById(auth.user_id);
+    return user;
 };
 
-const createSocialUser = async(email: string) =>{
-    const user=await prisma.user.create({
-        user_name:"",
-        email: email,
-        password:"",
-        refresh_token:""
+const createSocialUser = async(email: string, kakaoId:string) =>{
+    const user = await prisma.user.create({
+        data:{
+            user_name: "",
+            email: email,
+            password:"",
+            refresh_token:""
+        }
     });
-    const auth=await prisma.autentication_provider.create({
-        user_id:user.id,
-        provider_type: "kakao"
+    if(!user)
+        return "유저가 생성되지 않았습니다.";
+
+    const auth = await prisma.authenticationProvider.create({
+        data: {
+            user_id: user.id,
+            provider_type: "kakao",
+            id:kakaoId.toString()
+        }
     });
     await updateRefreshToken(user.id);
 };
