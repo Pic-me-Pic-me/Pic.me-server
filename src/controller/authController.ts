@@ -20,10 +20,10 @@ const createUser = async (req: Request, res: Response) => {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.SIGNUP_FAIL));
     }
 
-    const accessToken = jwtHandler.sign(data.user_id);
+    const accessToken = jwtHandler.sign(data.id);
 
     const result = {
-        id: data.user_id,
+        id: data.id,
         userName: data.user_name,
         refreshToken: data.refresh_token,
         accessToken,

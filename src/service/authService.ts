@@ -29,7 +29,7 @@ const chkByUserName = async (username: string) => {
 const findById = async (id: number) => {
     const user = await prisma.user.findUnique({
         where: {
-            user_id: id,
+            id: id,
         },
     });
 
@@ -52,18 +52,18 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
         },
     });
 
-    const refreshToken = jwtHandler.signRefresh(data.user_id);
+    const refreshToken = jwtHandler.signRefresh(data.id);
 
     await prisma.user.update({
         where: {
-            user_id: data.user_id,
+            id: data.id,
         },
         data: {
             refresh_token: refreshToken,
         },
     });
 
-    const user = await findById(data.user_id);
+    const user = await findById(data.id);
 
     return user;
 };
@@ -76,7 +76,7 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
         const isMatch = await bcrypt.compare(userSignInDto.password, user.password!);
         if (!isMatch) return sc.UNAUTHORIZED;
 
-        return user.user_id;
+        return user.id;
     } catch (error) {
         console.log(error);
         throw error;

@@ -8,15 +8,15 @@ datasource db {
 }
 
 model Picture {
-  picture_id Int    @id @default(autoincrement())
-  vote_id    Int
-  url        String @db.VarChar(800)
-  count      Int?
-  Vote       Vote   @relation(fields: [vote_id], references: [vote_id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
+  id      Int    @id @unique @default(autoincrement())
+  vote_id Int
+  url     String @db.VarChar(800)
+  count   Int?
+  Vote    Vote   @relation(fields: [vote_id], references: [id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
 }
 
 model User {
-  user_id       Int    @id @default(autoincrement())
+  id            Int    @id @unique @default(autoincrement())
   user_name     String @db.VarChar(200)
   email         String @db.VarChar(500)
   password      String @db.VarChar(500)
@@ -25,12 +25,12 @@ model User {
 }
 
 model Vote {
-  vote_id    Int       @id @default(autoincrement())
+  id         Int       @id @unique @default(autoincrement())
   user_id    Int
   status     Boolean?
   title      String    @db.VarChar(25)
   count      Int
   created_at DateTime  @default(now())
   Picture    Picture[]
-  User       User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "vote_user_user_id_fk")
+  User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "vote_user_user_id_fk")
 }
