@@ -1,8 +1,10 @@
-// import { Router } from "express";
-// import userRouter from "./userRouter";
+import { Router } from "express";
+import voteRouter from "./voteRouter";
+import authRouter from "./authRouter";
 
-// const router: Router = Router();
+const router: Router = Router();
 
-// router.use("/user", userRouter);
+router.use("/vote", voteRouter);
+router.use("/auth", authRouter);
 
-// export default router;
+export default router;
