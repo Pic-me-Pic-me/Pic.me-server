@@ -78,14 +78,13 @@ const getUser = async(req:Request, res:Response)=>{
         return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NO_SOCIAL_USER));
 
     //회원가입 했는지 확인하기 - id로 확인하기
-    const existUser=await authService.findByKey((user as SocialUser).userId, social);
+    let existUser=await authService.findByKey((user as SocialUser).userId, social);
     
-    if(!existUser){ //id를 받는다. 
-        return await authService.createSocialUser((user as SocialUser).email!);
+    if(!existUser){ //안했다 -> 이메일 넣어서 회원가입 
+        return await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
     }
-
     //있다면 새 토큰으로 발급해주고 업데이트
-    await authService.updateRefreshToken(existUser.id);
+    return await authService.updateRefreshToken(existUser.id);
 };
 
 const authController = {
