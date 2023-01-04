@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { voteService } from "../service";
 import {VoteCreateDTO} from "../interface/VoteCreateDTO";
+import { rm , sc} from "../constants";
+import {fail, success} from "../constants/response";
 
 const createVote= async(req: Request, res:Response) => {
     const {userId}=req.params;
@@ -14,12 +16,12 @@ const createVote= async(req: Request, res:Response) => {
         count:0,
     };
     const data=await voteService.createVote(+userId, voteDTO);
-
-    if(!data){
-        res.status(404).send("실패");
-    }
-    res.status(200).send("성공");
-}
+    if(!data)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
+    if(data==sc.BAD_REQUEST)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
+    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
+};
 
 const voteController = {
     createVote

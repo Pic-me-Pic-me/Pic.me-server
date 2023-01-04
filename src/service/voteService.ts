@@ -1,12 +1,11 @@
 import { PictureCreateDTO } from './../interface/PictureCreateDTO';
 import { VoteCreateDTO } from './../interface/VoteCreateDTO';
 import {PrismaClient} from "@prisma/client";
+import { sc } from '../constants';
 
 const prisma=new PrismaClient();
 
 const createVote= async(userId:number, voteDTO:VoteCreateDTO)=>{
-    if(!userId)
-        return null;
     const data=await prisma.vote.create({
         data:{
             user_id:userId,
@@ -18,15 +17,14 @@ const createVote= async(userId:number, voteDTO:VoteCreateDTO)=>{
     if(!data)
         return null;
 
-    await createPictures(+data.vote_id, voteDTO.pictures[0]);
-    await createPictures(+data.vote_id, voteDTO.pictures[1]);
-    
+    if(await createPictures(+data.id, voteDTO.pictures[0])==null)
+        return sc.BAD_REQUEST;
+    if(await createPictures(+data.id, voteDTO.pictures[0])==null)
+        return sc.BAD_REQUEST;
     return data;
 };
 
 const createPictures = async(voteId:number, pictureUrl:string) => {
-    if(!voteId)
-        return null;
     const data=await prisma.picture.create({
         data:{
             url:pictureUrl,
@@ -34,8 +32,10 @@ const createPictures = async(voteId:number, pictureUrl:string) => {
             vote_id:voteId
         }
     });
-    return data.picture_id;
-}
+    if(!data)
+        return null;
+    return data.id;
+};
 
 const voteService ={
     createVote
