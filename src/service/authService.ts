@@ -9,39 +9,39 @@ import jwtHandler from "../modules/jwtHandler";
 const chkByEmail = async (email: string) => {
     const user = await prisma.user.findFirst({
         where: {
-            email: email
+            email: email,
         },
     });
 
     return user;
-}
+};
 
 const chkByUserName = async (username: string) => {
     const user = await prisma.user.findFirst({
         where: {
-            user_name: username
+            user_name: username,
         },
     });
 
     return user;
-}
+};
 
 const findById = async (id: number) => {
     const user = await prisma.user.findUnique({
         where: {
-            user_id: id
+            user_id: id,
         },
     });
 
     return user;
-}
+};
 
 const createUser = async (userCreateDto: UserCreateDTO) => {
-    if((await chkByEmail(userCreateDto.email))) return null;
-    if((await chkByUserName(userCreateDto?.username))) return null;
+    if (await chkByEmail(userCreateDto.email)) return null;
+    if (await chkByUserName(userCreateDto?.username)) return null;
 
     const salt = await bcrypt.genSalt(10);
-    const password = await bcrypt.hash(userCreateDto.password, salt); 
+    const password = await bcrypt.hash(userCreateDto.password, salt);
 
     const data = await prisma.user.create({
         data: {
@@ -49,19 +49,19 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
             email: userCreateDto.email,
             refresh_token: "",
             password,
-        }
+        },
     });
 
     const refreshToken = jwtHandler.signRefresh(data.user_id);
 
     await prisma.user.update({
         where: {
-            user_id: data.user_id
+            user_id: data.user_id,
         },
         data: {
-            refresh_token: refreshToken
-        }
-    })
+            refresh_token: refreshToken,
+        },
+    });
 
     const user = await findById(data.user_id);
 
@@ -86,12 +86,12 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
 const getEmailById = async (id: number) => {
     const user = await findById(id);
     return user?.user_name;
-}
+};
 
 const authService = {
     createUser,
     signIn,
-    getEmailById
+    getEmailById,
 };
 
 export default authService;
