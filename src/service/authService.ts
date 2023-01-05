@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
-import { sc } from "../constants";
+import { sc, rm, socialType } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
+import { auth } from "../middlewares";
 import jwtHandler from "../modules/jwtHandler";
+import kakaoAuth from "../config/kakaoAuth";
 
 const chkByEmail = async (email: string) => {
     const user = await prisma.user.findFirst({
@@ -52,16 +54,7 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
         },
     });
 
-    const refreshToken = jwtHandler.signRefresh(data.id);
-
-    await prisma.user.update({
-        where: {
-            id: data.id,
-        },
-        data: {
-            refresh_token: refreshToken,
-        },
-    });
+    await updateRefreshToken(data.id);
 
     const user = await findById(data.id);
 
@@ -88,10 +81,67 @@ const getEmailById = async (id: number) => {
     return user?.user_name;
 };
 
+const getUser = async(social:string, token:string) => {
+    if(social!=socialType.KAKAO)
+        return rm.NO_SOCIAL_TYPE;
+    const user=await kakaoAuth(token);
+    return user;
+};
+
+const findByKey= async(kakaoId: string, socialType:string) =>{
+    const auth=await prisma.authenticationProvider.findUnique({
+        where:{
+            id:kakaoId.toString()
+        }
+    }); 
+    if(!auth)
+        return null;
+    const user=await findById(auth.user_id);
+    return user;
+};
+
+const createSocialUser = async(email: string, kakaoId:string) =>{
+    const user = await prisma.user.create({
+        data:{
+            user_name: "",
+            email: email,
+            password:"",
+            refresh_token:""
+        }
+    });
+
+    const auth = await prisma.authenticationProvider.create({
+        data: {
+            user_id: user.id,
+            provider_type: socialType.KAKAO,
+            id:kakaoId.toString()
+        }
+    });
+    const data=await updateRefreshToken(user.id);
+    return data;
+};
+
+const updateRefreshToken = async(userId: number) => {
+    const refreshToken = jwtHandler.signRefresh(userId);
+    const data=await prisma.user.update({
+        where:{
+            id: userId
+        },
+        data:{
+            refresh_token: refreshToken
+        }
+    });
+    return data;
+}
+
 const authService = {
     createUser,
     signIn,
     getEmailById,
+    getUser,
+    findByKey,
+    createSocialUser,
+    updateRefreshToken
 };
 
 export default authService;

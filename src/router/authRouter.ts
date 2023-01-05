@@ -16,4 +16,6 @@ router.post(
     authController.signInUser
 );
 
+router.post("/kakao", authController.getUser);
+
 export default router;

@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id            Int    @id @unique @default(autoincrement())
-  user_name     String @db.VarChar(200)
-  email         String @db.VarChar(500)
-  password      String @db.VarChar(500)
-  refresh_token String @db.VarChar(500)
-  Vote          Vote[]
+  id                     Int                      @id @unique @default(autoincrement())
+  user_name              String?                  @db.VarChar(200)
+  email                  String?                  @db.VarChar(500)
+  password               String?                  @db.VarChar(500)
+  refresh_token          String?                  @db.VarChar(500)
+  AuthenticationProvider AuthenticationProvider[]
+  Vote                   Vote[]
 }
 
 model Vote {
@@ -28,9 +29,26 @@ model Vote {
 }
 
 model Picture {
-  id      Int    @id @unique @default(autoincrement())
+  id      Int       @id @unique @default(autoincrement())
   vote_id Int
-  url     String @db.VarChar(800)
+  url     String    @db.VarChar(800)
   count   Int?
-  Vote    Vote   @relation(fields: [vote_id], references: [id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
+  Vote    Vote      @relation(fields: [vote_id], references: [id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
+  Sticker Sticker[]
+}
+
+model AuthenticationProvider {
+  id            String @id @db.VarChar(200)
+  provider_type String @db.VarChar(20)
+  user_id       Int
+  User          User   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "authenticationprovider_user_id_fk")
+}
+
+model Sticker {
+  id               Int     @id @default(autoincrement())
+  sticker_location String? @db.VarChar(100000)
+  picture_id       Int
+  emoji            Int
+  count            Int?
+  Picture          Picture @relation(fields: [picture_id], references: [id], onDelete: Cascade, map: "sticker_picture_id_fk")
 }
