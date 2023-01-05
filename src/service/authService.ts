@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
-import { sc } from "../constants";
+import { sc, rm } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
 import { auth } from "../middlewares";
@@ -91,9 +91,7 @@ const getEmailById = async (id: number) => {
 };
 
 const getUser = async(socialType:string, token:string) => {
-    let user;
-
-    user=await kakaoAuth(token);
+    const user=await kakaoAuth(token);
     return user;
 };
 
@@ -118,8 +116,6 @@ const createSocialUser = async(email: string, kakaoId:string) =>{
             refresh_token:""
         }
     });
-    if(!user)
-        return "유저가 생성되지 않았습니다.";
 
     const auth = await prisma.authenticationProvider.create({
         data: {
@@ -133,7 +129,7 @@ const createSocialUser = async(email: string, kakaoId:string) =>{
 
 const updateRefreshToken = async(userId: number) => {
     const refreshToken = jwtHandler.signRefresh(userId);
-    await prisma.user.update({
+    const data=await prisma.user.update({
         where:{
             id: userId
         },
@@ -141,6 +137,7 @@ const updateRefreshToken = async(userId: number) => {
             refresh_token: refreshToken
         }
     });
+    return data;
 }
 
 const authService = {

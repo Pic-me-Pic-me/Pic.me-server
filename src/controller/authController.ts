@@ -4,7 +4,7 @@ import { authService } from "../service";
 import { rm, sc } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
-import { SocialUser } from "../interfaces/SocialUser";
+import { SocialUser } from "../interfaces/SocialUserDTO";
 import { fail, success } from "../constants/response";
 import jwtHandler from "../modules/jwtHandler";
 
@@ -68,23 +68,24 @@ const getUser = async(req:Request, res:Response)=>{
     const social=req.body.socialType;
     const token=req.body.token;
 
-    if(!social || !token) //없는 경우
-        return;
+    if(!social || !token)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+
     const user=await authService.getUser(social, token);
-    //여기에 email, 카카오 userId가 있음
-
-        // 유저가 없는 경우 & 토큰이 유효하지않은 경우
     if(!user)
-        return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NO_SOCIAL_USER));
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.NOT_FOUND, rm.INVALID_TOKEN));
+    if(user==rm.NO_SOCIAL_USER)
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
 
-    //회원가입 했는지 확인하기 - id로 확인하기
     let existUser=await authService.findByKey((user as SocialUser).userId, social);
     
-    if(!existUser){ //안했다 -> 이메일 넣어서 회원가입 
-        return await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
+    if(!existUser){
+        const data=await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
+        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, data));
     }
-    //있다면 새 토큰으로 발급해주고 업데이트
-    return await authService.updateRefreshToken(existUser.id);
+    const updatedUser= await authService.updateRefreshToken(existUser.id);
+    
+    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS,updatedUser));
 };
 
 const authController = {
