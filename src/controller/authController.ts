@@ -49,11 +49,14 @@ const signInUser = async (req: Request, res: Response) => {
 
         const userName = await authService.getEmailById(data!);
 
+        const user = await authService.updateRefreshToken(data);
+
         const accessToken = jwtHandler.sign(data);
 
         const result = {
             id: data,
             userName: userName,
+            refreshToken: user.refresh_token,
             accessToken,
         };
 
@@ -64,40 +67,36 @@ const signInUser = async (req: Request, res: Response) => {
     }
 };
 
-const getUser = async(req:Request, res:Response)=>{
-    const social=req.body.socialType;
-    const token=req.body.token;
+const getUser = async (req: Request, res: Response) => {
+    const social = req.body.socialType;
+    const token = req.body.token;
 
-    if(!social || !token)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!social || !token) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
 
-    const user=await authService.getUser(social, token);
-    if(!user)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
-    if(user==rm.NO_SOCIAL_TYPE)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
-    if(user==rm.NO_SOCIAL_USER)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
-    let existUser=await authService.findByKey((user as SocialUser).userId, social);
-    
-    if(!existUser){
-        const data=await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
+    const user = await authService.getUser(social, token);
+    if (!user) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (user == rm.NO_SOCIAL_TYPE) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
+    if (user == rm.NO_SOCIAL_USER) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
+    let existUser = await authService.findByKey((user as SocialUser).userId, social);
+
+    if (!existUser) {
+        const data = await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
         const accessToken = jwtHandler.sign(data.id);
-        const result= {
+        const result = {
             id: data.id,
             accessToken: accessToken,
-            refreshToken: data.refresh_token 
+            refreshToken: data.refresh_token,
         };
         return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, result));
     }
-    const updatedUser= await authService.updateRefreshToken(existUser.id);
-    const accessToken=jwtHandler.sign(updatedUser.id);
-    const result={
-        id:updatedUser.id,
+    const updatedUser = await authService.updateRefreshToken(existUser.id);
+    const accessToken = jwtHandler.sign(updatedUser.id);
+    const result = {
+        id: updatedUser.id,
         accessToken: accessToken,
-        refreshToken: updatedUser.refresh_token
+        refreshToken: updatedUser.refresh_token,
     };
-    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS,result));
+    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, result));
 };
 
 const authController = {
