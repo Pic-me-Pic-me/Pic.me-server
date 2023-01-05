@@ -54,16 +54,7 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
         },
     });
 
-    const refreshToken = jwtHandler.signRefresh(data.id);
-
-    await prisma.user.update({
-        where: {
-            id: data.id,
-        },
-        data: {
-            refresh_token: refreshToken,
-        },
-    });
+    await updateRefreshToken(data.id);
 
     const user = await findById(data.id);
 
