@@ -87,7 +87,7 @@
 
 # 역할 분담 및 API 로직 구현 진척도
 
-https://instinctive-hoverfly-ed0.notion.site/API-195e5d20e0ba4bcfba3f168755aec505
+https://charm-wolfsbane-f42.notion.site/API-ff429d56790c4ecb8c0d877852bf95a2
 
 # ✅ 커밋 컨벤션
 
