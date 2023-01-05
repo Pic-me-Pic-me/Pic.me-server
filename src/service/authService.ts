@@ -81,58 +81,56 @@ const getEmailById = async (id: number) => {
     return user?.user_name;
 };
 
-const getUser = async(social:string, token:string) => {
-    if(social!=socialType.KAKAO)
-        return rm.NO_SOCIAL_TYPE;
-    const user=await kakaoAuth(token);
+const getUser = async (social: string, token: string) => {
+    if (social != socialType.KAKAO) return rm.NO_SOCIAL_TYPE;
+    const user = await kakaoAuth(token);
     return user;
 };
 
-const findByKey= async(kakaoId: string, socialType:string) =>{
-    const auth=await prisma.authenticationProvider.findUnique({
-        where:{
-            id:kakaoId.toString()
-        }
-    }); 
-    if(!auth)
-        return null;
-    const user=await findById(auth.user_id);
+const findByKey = async (kakaoId: string, socialType: string) => {
+    const auth = await prisma.authenticationProvider.findUnique({
+        where: {
+            id: kakaoId,
+        },
+    });
+    if (!auth) return null;
+    const user = await findById(auth.user_id);
     return user;
 };
 
-const createSocialUser = async(email: string, kakaoId:string) =>{
+const createSocialUser = async (email: string, nickname: string, kakaoId: string) => {
     const user = await prisma.user.create({
-        data:{
-            user_name: "",
+        data: {
+            user_name: nickname,
             email: email,
-            password:"",
-            refresh_token:""
-        }
+            password: "",
+            refresh_token: "",
+        },
     });
 
     const auth = await prisma.authenticationProvider.create({
         data: {
             user_id: user.id,
             provider_type: socialType.KAKAO,
-            id:kakaoId.toString()
-        }
+            id: kakaoId.toString(),
+        },
     });
-    const data=await updateRefreshToken(user.id);
+    const data = await updateRefreshToken(user.id);
     return data;
 };
 
-const updateRefreshToken = async(userId: number) => {
+const updateRefreshToken = async (userId: number) => {
     const refreshToken = jwtHandler.signRefresh(userId);
-    const data=await prisma.user.update({
-        where:{
-            id: userId
+    const data = await prisma.user.update({
+        where: {
+            id: userId,
         },
-        data:{
-            refresh_token: refreshToken
-        }
+        data: {
+            refresh_token: refreshToken,
+        },
     });
     return data;
-}
+};
 
 const authService = {
     createUser,
@@ -141,7 +139,7 @@ const authService = {
     getUser,
     findByKey,
     createSocialUser,
-    updateRefreshToken
+    updateRefreshToken,
 };
 
 export default authService;
