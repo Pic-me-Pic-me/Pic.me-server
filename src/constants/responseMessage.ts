@@ -10,6 +10,8 @@ export default {
     SIGNIN_SUCCESS: "로그인 성공",
     SIGNIN_FAIL: "로그인 실패",
     ALREADY_NICKNAME: "이미 사용중인 닉네임입니다.",
+    SOCIAL_SIGNIN_SUCCESS: "소셜 로그인 성공",
+    SOCIAL_SIGNUP_SUCCESS:"소셜 회원가입 성공",
   
     // user
     READ_USER_SUCCESS: "유저 조회 성공",
@@ -18,9 +20,10 @@ export default {
     DELETE_USER_SUCCESS: "유저 탈퇴 성공",
     DELETE_USER_FAIL: "유저 탈퇴 실패",
     NO_USER: "탈퇴했거나 가입하지 않은 유저입니다.",
+    NOT_SIGNUP_SOCIAL_USER:"아직 회원가입하지 않은 소셜 유저입니다.",
+    IS_SOCIAL_USER: "회원가입 된 소셜 유저입니다",
     NO_SOCIAL_USER: "소셜 서비스에 가입하지 않은 유저입니다",
     NO_SOCIAL_TYPE:"제공하는 소셜 서비스가 다릅니다.",
-    SOCIAL_LOGIN_SUCCESS: "소셜 로그인 성공",
     INVALID_PASSWORD: "잘못된 비밀번호입니다.",
     INVALID_EMAIL: "잘못된 이메일입니다.",
   
