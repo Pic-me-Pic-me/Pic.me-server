@@ -22,7 +22,7 @@ const createVote = async (req: Request, res: Response) => {
     if(!data)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
     if(data==sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_PICTURE_FAIL));
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
