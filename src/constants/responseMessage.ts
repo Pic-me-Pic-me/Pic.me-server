@@ -19,6 +19,7 @@ export default {
     DELETE_USER_FAIL: "유저 탈퇴 실패",
     NO_USER: "탈퇴했거나 가입하지 않은 유저입니다.",
     NO_SOCIAL_USER: "소셜 서비스에 가입하지 않은 유저입니다",
+    NO_SOCIAL_TYPE:"제공하는 소셜 서비스가 다릅니다.",
     SOCIAL_LOGIN_SUCCESS: "소셜 로그인 성공",
     INVALID_PASSWORD: "잘못된 비밀번호입니다.",
     INVALID_EMAIL: "잘못된 이메일입니다.",

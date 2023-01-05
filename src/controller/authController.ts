@@ -73,10 +73,11 @@ const getUser = async(req:Request, res:Response)=>{
 
     const user=await authService.getUser(social, token);
     if(!user)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.NOT_FOUND, rm.INVALID_TOKEN));
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if(user==rm.NO_SOCIAL_TYPE)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
     if(user==rm.NO_SOCIAL_USER)
         return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
-
     let existUser=await authService.findByKey((user as SocialUser).userId, social);
     
     if(!existUser){
@@ -84,7 +85,6 @@ const getUser = async(req:Request, res:Response)=>{
         return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, data));
     }
     const updatedUser= await authService.updateRefreshToken(existUser.id);
-    
     return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS,updatedUser));
 };
 

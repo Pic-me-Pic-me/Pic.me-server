@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
-import { sc, rm } from "../constants";
+import { sc, rm, socialType } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
 import { auth } from "../middlewares";
@@ -90,7 +90,9 @@ const getEmailById = async (id: number) => {
     return user?.user_name;
 };
 
-const getUser = async(socialType:string, token:string) => {
+const getUser = async(social:string, token:string) => {
+    if(social!=socialType.KAKAO)
+        return rm.NO_SOCIAL_TYPE;
     const user=await kakaoAuth(token);
     return user;
 };
@@ -120,7 +122,7 @@ const createSocialUser = async(email: string, kakaoId:string) =>{
     const auth = await prisma.authenticationProvider.create({
         data: {
             user_id: user.id,
-            provider_type: "kakao",
+            provider_type: socialType.KAKAO,
             id:kakaoId.toString()
         }
     });
