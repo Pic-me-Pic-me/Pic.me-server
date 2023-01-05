@@ -55,17 +55,15 @@ const playerGetPictures = async (voteId: number) => {
         },
     });
 
-    if (data) {
-        const resultDTO: PlayerPicturesGetDTO = {
-            voteId: data?.id as number,
-            voteStatus: data?.status as boolean,
-            voteTitle: data?.title as string,
-            Picture: data?.Picture as object[],
-        };
-        return resultDTO;
-    } else {
-        return null;
-    }
+    if (!data) return null;
+
+    const resultDTO: PlayerPicturesGetDTO = {
+        voteId: data?.id as number,
+        voteStatus: data?.status as boolean,
+        voteTitle: data?.title as string,
+        Picture: data?.Picture as object[],
+    };
+    return resultDTO;
 };
 
 const voteService = {
