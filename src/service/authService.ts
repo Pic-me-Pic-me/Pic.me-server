@@ -90,7 +90,7 @@ const getUser = async (social: string, token: string) => {
 const findByKey = async (kakaoId: string, socialType: string) => {
     const auth = await prisma.authenticationProvider.findUnique({
         where: {
-            id: kakaoId.toString(),
+            id: kakaoId,
         },
     });
     if (!auth) return null;
@@ -98,10 +98,10 @@ const findByKey = async (kakaoId: string, socialType: string) => {
     return user;
 };
 
-const createSocialUser = async (email: string, kakaoId: string) => {
+const createSocialUser = async (email: string, nickname: string, kakaoId: string) => {
     const user = await prisma.user.create({
         data: {
-            user_name: "",
+            user_name: nickname,
             email: email,
             password: "",
             refresh_token: "",
