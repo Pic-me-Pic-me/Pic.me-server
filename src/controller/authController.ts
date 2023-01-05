@@ -82,10 +82,22 @@ const getUser = async(req:Request, res:Response)=>{
     
     if(!existUser){
         const data=await authService.createSocialUser((user as SocialUser).email as string, (user as SocialUser).userId as string);
-        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, data));
+        const accessToken = jwtHandler.sign(data.id);
+        const result= {
+            id: data.id,
+            accessToken: accessToken,
+            refreshToken: data.refresh_token 
+        };
+        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS, result));
     }
     const updatedUser= await authService.updateRefreshToken(existUser.id);
-    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS,updatedUser));
+    const accessToken=jwtHandler.sign(updatedUser.id);
+    const result={
+        id:updatedUser.id,
+        accessToken: accessToken,
+        refreshToken: updatedUser.refresh_token
+    };
+    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_LOGIN_SUCCESS,result));
 };
 
 const authController = {
