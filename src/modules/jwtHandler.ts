@@ -6,7 +6,7 @@ const sign = (userId: number) => {
         userId,
     };
 
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: "2h" });
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: "1m" });
     return accessToken;
 };
 
@@ -40,5 +40,5 @@ const verify = (token: string) => {
 export default {
     sign,
     signRefresh,
-    verify 
+    verify,
 };

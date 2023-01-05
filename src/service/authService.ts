@@ -132,6 +132,16 @@ const updateRefreshToken = async (userId: number) => {
     return data;
 };
 
+const tokenRefresh = async (userId: number, refreshToken: String) => {
+    const user = await findById(userId);
+
+    if (user?.refresh_token != refreshToken) return null;
+
+    const accessToken = jwtHandler.sign(userId);
+
+    return accessToken;
+};
+
 const authService = {
     createUser,
     signIn,
@@ -140,6 +150,7 @@ const authService = {
     findByKey,
     createSocialUser,
     updateRefreshToken,
+    tokenRefresh,
 };
 
 export default authService;

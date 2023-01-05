@@ -16,6 +16,8 @@ router.post(
     authController.signInUser
 );
 
+router.post("/token", authController.tokenRefresh);
+
 router.post("/kakao", authController.getUser);
 
 export default router;
