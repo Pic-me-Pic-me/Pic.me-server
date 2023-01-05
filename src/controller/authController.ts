@@ -6,6 +6,8 @@ import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
 import { SocialUser } from "../interfaces/SocialUserDTO";
 import { fail, success } from "../constants/response";
+import { JwtPayload } from "jsonwebtoken";
+import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
 
 const createUser = async (req: Request, res: Response) => {
@@ -49,11 +51,14 @@ const signInUser = async (req: Request, res: Response) => {
 
         const userName = await authService.getEmailById(data!);
 
+        const user = await authService.updateRefreshToken(data);
+
         const accessToken = jwtHandler.sign(data);
 
         const result = {
             id: data,
             userName: userName,
+            refreshToken: user.refresh_token,
             accessToken,
         };
 
@@ -134,14 +139,51 @@ const loginSocialUser = async(req:Request, res:Response) => { // 로그인하기
         id:updatedUser.id,
         user_name:updatedUser.user_name,
         accessToken: accessToken,
-        refreshToken: updatedUser.refresh_token
+        refreshToken: updatedUser.refresh_token,
     };
+
     return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS,result));
+};
+
+const tokenRefresh = async (req: Request, res: Response) => {
+    const { refreshToken, accessToken } = req.body;
+
+    if (!refreshToken || !accessToken) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EMPTY_TOKEN));
+
+    const refreshDecoded = jwtHandler.verify(refreshToken);
+    const decoded = jwtHandler.verify(accessToken);
+
+    // refreshToken, accessToken all expired
+    if (refreshDecoded === tokenType.TOKEN_EXPIRED && decoded === tokenType.TOKEN_EXPIRED)
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_ALL_TOKEN));
+    // refreshToken expired
+    if (refreshDecoded === tokenType.TOKEN_EXPIRED) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
+    // refreshToken or accessToken invalid
+    if (refreshDecoded === tokenType.TOKEN_INVALID || decoded === tokenType.TOKEN_INVALID)
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+
+    // accessToken still valid
+    const accessTokenChk: number = (decoded as JwtPayload).userId;
+    if (accessTokenChk) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VALID_TOKEN));
+
+    const userId: number = (refreshDecoded as JwtPayload).userId;
+    if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+
+    const newAccessToken = await authService.tokenRefresh(userId, refreshToken);
+
+    if (!newAccessToken) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TOKEN_OWNER));
+
+    const result = {
+        accessToken: newAccessToken,
+    };
+
+    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_TOKEN_SUCCESS, result));
 };
 
 const authController = {
     createUser,
     signInUser,
+    tokenRefresh,
     createSocialUser,
     findSocialUSer,
     loginSocialUser

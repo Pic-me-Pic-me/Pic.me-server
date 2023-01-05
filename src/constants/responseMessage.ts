@@ -25,7 +25,8 @@ export default {
     NOT_SIGNUP_SOCIAL_USER:"아직 회원가입하지 않은 소셜 유저입니다.",
     IS_SOCIAL_USER: "회원가입 된 소셜 유저입니다",
     NO_SOCIAL_USER: "소셜 서비스에 가입하지 않은 유저입니다",
-    NO_SOCIAL_TYPE:"제공하는 소셜 서비스가 다릅니다.",
+    NO_SOCIAL_TYPE: "제공하는 소셜 서비스가 다릅니다.",
+    SOCIAL_LOGIN_SUCCESS: "소셜 로그인 성공",
     INVALID_PASSWORD: "잘못된 비밀번호입니다.",
     INVALID_EMAIL: "잘못된 이메일입니다.",
 
@@ -36,6 +37,7 @@ export default {
     INVALID_TOKEN: "유효하지 않은 토큰입니다.",
     VALID_TOKEN: "유효한 토큰입니다.",
     EMPTY_TOKEN: "토큰 값이 없습니다.",
+    NOT_TOKEN_OWNER: "본인의 토큰이 아닙니다.",
 
     // vote
     CREATE_VOTE_SUCCESS: "투표 생성 성공",
