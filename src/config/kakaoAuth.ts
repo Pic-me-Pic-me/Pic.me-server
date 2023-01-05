@@ -1,4 +1,4 @@
-import { SocialUser } from './../interfaces/SocialUser';
+import { SocialUser } from '../interfaces/SocialUserDTO';
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import {rm} from "../constants"
@@ -12,16 +12,15 @@ export default async(kakaoAccessToken: string) => {
                 Authorization: `Bearer ${kakaoAccessToken}`
             },
         });
-
         const userId=user.data.id;
         if(!userId)
             return rm.NO_SOCIAL_USER;
 
         let email="";
         
-        if(user.data.kakao_account.email){
+        if(user.data.kakao_account.email)
             email=user.data.kakao_account.email;
-        }
+        
         const kakaoUser: SocialUser = {
             userId:userId,
             email:email,
@@ -29,7 +28,6 @@ export default async(kakaoAccessToken: string) => {
         }
         return kakaoUser;
     }catch(error){
-
         return null;
     }
 };
