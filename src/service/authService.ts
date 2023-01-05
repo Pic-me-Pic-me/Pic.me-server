@@ -117,7 +117,8 @@ const createSocialUser = async(email: string, kakaoId:string) =>{
             id:kakaoId.toString()
         }
     });
-    await updateRefreshToken(user.id);
+    const data=await updateRefreshToken(user.id);
+    return data;
 };
 
 const updateRefreshToken = async(userId: number) => {
