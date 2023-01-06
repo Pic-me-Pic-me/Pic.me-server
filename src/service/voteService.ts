@@ -2,6 +2,7 @@ import { PlayerPicturesGetDTO } from "./../interfaces/PlayerPicturesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
+import { rm } from "fs";
 
 const prisma = new PrismaClient();
 
@@ -31,6 +32,26 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
     });
     if (!data) return null;
     return data.id;
+};
+
+const deleteVote = async (userId: number, voteId: number) => {
+    await prisma.vote.delete({
+        where: {
+            id: voteId,
+        },
+    });
+    return sc.OK;
+};
+
+const findVoteById = async (userId: number, voteId: number) => {
+    const vote = await prisma.vote.findUnique({
+        where: {
+            id: voteId,
+        },
+    });
+    if (!vote) return null;
+    if (vote.user_id != userId) return sc.BAD_REQUEST;
+    return vote;
 };
 
 /*
@@ -69,6 +90,8 @@ const playerGetPictures = async (voteId: number) => {
 const voteService = {
     createVote,
     playerGetPictures,
+    findVoteById,
+    deleteVote,
 };
 
 export default voteService;
