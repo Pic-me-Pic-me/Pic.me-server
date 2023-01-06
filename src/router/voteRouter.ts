@@ -12,4 +12,5 @@ router.post("/:userId", upload.array("file"), voteController.createVote);
 
 router.get("/:voteId", voteController.playerGetPictures);
 
+router.get("/player/:pictureId", voteController.playerGetVotedResult); //라우터 추천좀
 export default router;
