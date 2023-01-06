@@ -21,6 +21,31 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     return data;
 };
 
+const closeVote = async (voteId: number, userId: number) => {
+    const vote = await prisma.vote.findUnique({
+        where: {
+            id: voteId,
+        },
+    });
+
+    if (!vote) return null;
+
+    if (vote.user_id != userId) return sc.UNAUTHORIZED;
+
+    const data = await prisma.vote.update({
+        where: {
+            id: voteId,
+        },
+        data: {
+            status: false,
+        },
+    });
+
+    if (!data) return null;
+
+    return data.id;
+};
+
 const createPictures = async (voteId: number, pictureUrl: string) => {
     const data = await prisma.picture.create({
         data: {
@@ -68,6 +93,7 @@ const playerGetPictures = async (voteId: number) => {
 
 const voteService = {
     createVote,
+    closeVote,
     playerGetPictures,
 };
 

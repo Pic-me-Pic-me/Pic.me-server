@@ -38,9 +38,21 @@ const playerGetPictures = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
+const closeVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const { userId } = req.body;
+
+    const result = await voteService.closeVote(+voteId, userId);
+    if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
+    if (result == sc.UNAUTHORIZED) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
+};
+
 const voteController = {
     createVote,
     playerGetPictures,
+    closeVote,
 };
 
 export default voteController;
