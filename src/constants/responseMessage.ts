@@ -11,8 +11,8 @@ export default {
     SIGNIN_FAIL: "로그인 실패",
     ALREADY_NICKNAME: "이미 사용중인 닉네임입니다.",
     SOCIAL_SIGNIN_SUCCESS: "소셜 로그인 성공",
-    SOCIAL_SIGNUP_SUCCESS:"소셜 회원가입 성공",
-  
+    SOCIAL_SIGNUP_SUCCESS: "소셜 회원가입 성공",
+
     // user
     READ_USER_SUCCESS: "유저 조회 성공",
     READ_USER_FAIL: "유저 조회 실패",
@@ -22,7 +22,7 @@ export default {
     DELETE_USER_SUCCESS: "유저 탈퇴 성공",
     DELETE_USER_FAIL: "유저 탈퇴 실패",
     NO_USER: "탈퇴했거나 가입하지 않은 유저입니다.",
-    NOT_SIGNUP_SOCIAL_USER:"아직 회원가입하지 않은 소셜 유저입니다.",
+    NOT_SIGNUP_SOCIAL_USER: "아직 회원가입하지 않은 소셜 유저입니다.",
     IS_SOCIAL_USER: "회원가입 된 소셜 유저입니다",
     NO_SOCIAL_USER: "소셜 서비스에 가입하지 않은 유저입니다",
     NO_SOCIAL_TYPE: "제공하는 소셜 서비스가 다릅니다.",
@@ -49,6 +49,8 @@ export default {
     PLAYER_GET_VOTE_RESULT_FAIL: "투표 결과를 받아올 수 없습니다.",
     PLAYER_GET_VOTE_SUCCESS: "투표 결과를 갖고 왔습니다.",
     PLAYER_VOTE_ALREADY_END: "이미 투표가 끝났습니다.",
+    NOT_VOTE_ID: "해당 투표 아이디가 존재하지 않습니다.",
+    DELETE_VOTE_SUCCESS: "투표가 삭제되었습니다.",
 
     // server error
     INTERNAL_SERVER_ERROR: "서버 내 오류",
