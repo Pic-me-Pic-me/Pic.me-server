@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { voteService } from "../service";
+import { authService, voteService } from "../service";
 import { rm, sc } from "../constants";
 import { fail, success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
@@ -24,6 +24,20 @@ const createVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
+const deleteVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const refreshToken = req.body.refreshToken;
+    const user = await authService.findByRefreshToken(refreshToken);
+    if (!user) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
+    const vote = await voteService.findVoteById(user.id, +voteId);
+    if (!vote) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
+    if (vote == sc.BAD_REQUEST) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
+
+    await voteService.deleteVote(user.id, +voteId);
+    return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
+};
+
 /*
  [ 플레이어 ]
 */
@@ -41,6 +55,7 @@ const playerGetPictures = async (req: Request, res: Response) => {
 const voteController = {
     createVote,
     playerGetPictures,
+    deleteVote,
 };
 
 export default voteController;
