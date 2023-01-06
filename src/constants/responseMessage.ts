@@ -51,6 +51,8 @@ export default {
     PLAYER_VOTE_ALREADY_END: "이미 투표가 끝났습니다.",
     NOT_VOTE_ID: "해당 투표 아이디가 존재하지 않습니다.",
     DELETE_VOTE_SUCCESS: "투표가 삭제되었습니다.",
+    DELETE_VOTE_FAIL: "투표 삭제 실패",
+    VOTE_USER_NOT_EQUAL: "투표 사용자의 투표가 아닙니다.",
 
     // server error
     INTERNAL_SERVER_ERROR: "서버 내 오류",
