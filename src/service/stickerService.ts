@@ -38,13 +38,15 @@ const createSticker = async (
 const updateSticker = async (
     tx: Prisma.TransactionClient,
     currentLocation: string,
-    currentCount: number,
+    length: number,
     stickerId: number
 ) => {
     const updatedSticker = await tx.sticker.update({
         data: {
             sticker_location: currentLocation,
-            count: currentCount,
+            count: {
+                increment: length,
+            },
         },
         where: {
             id: stickerId,
@@ -72,35 +74,46 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
                 stickerCreateDto.emoji
             );
 
+            let modifiedSticker;
             if (!sticker) {
                 const parsedLocation = JSON.stringify(stickerCreateDto.location);
 
-                const createdSticker = await createSticker(
+                modifiedSticker = await createSticker(
                     tx,
                     parsedLocation,
                     stickerCreateDto.pictureId,
                     stickerCreateDto.emoji,
                     length
                 );
-
-                return createdSticker;
             } else {
                 let parseCurrentLocation = JSON.parse(sticker.sticker_location as string);
-                let currentCount = sticker.count! + length;
                 stickerCreateDto.location.map((value: object) => {
                     parseCurrentLocation.push(value);
                 });
                 parseCurrentLocation = JSON.stringify(parseCurrentLocation);
 
-                const updatedSticker = await updateSticker(
-                    tx,
-                    parseCurrentLocation,
-                    currentCount,
-                    sticker.id
-                );
-
-                return updatedSticker.id;
+                modifiedSticker = await updateSticker(tx, parseCurrentLocation, length, sticker.id);
             }
+
+            const picture = await tx.picture.update({
+                where: { id: modifiedSticker.picture_id },
+                data: {
+                    count: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            await tx.vote.update({
+                where: { id: picture.vote_id },
+                data: {
+                    count: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            return modifiedSticker.id;
         });
 
         return data;
