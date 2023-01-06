@@ -26,15 +26,16 @@ const createVote = async (req: Request, res: Response) => {
 
 const deleteVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-    const refreshToken = req.body.refreshToken;
-    const user = await authService.findByRefreshToken(refreshToken);
-    if (!user) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    //const refreshToken = req.body.refreshToken;
+    //const user = await authService.findByRefreshToken(refreshToken);
+    const {userId}=req.body.id;
+    if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
     if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
-    const vote = await voteService.findVoteById(user.id, +voteId);
+    const vote = await voteService.findVoteById(userId, +voteId);
     if (!vote) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
     if (vote == sc.BAD_REQUEST) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
 
-    await voteService.deleteVote(user.id, +voteId);
+    await voteService.deleteVote(userId, +voteId);
     return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
 };
 
