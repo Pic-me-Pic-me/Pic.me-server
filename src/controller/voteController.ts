@@ -24,6 +24,14 @@ const createVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
+const getSingleVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const data = await voteService.getSingleVote(+voteId);
+
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+};
+
 /*
  [ 플레이어 ]
 */
@@ -41,6 +49,7 @@ const playerGetPictures = async (req: Request, res: Response) => {
 const voteController = {
     createVote,
     playerGetPictures,
+    getSingleVote,
 };
 
 export default voteController;
