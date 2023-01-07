@@ -14,6 +14,7 @@ export default {
     SOCIAL_SIGNUP_SUCCESS: "소셜 회원가입 성공",
     CHECK_KAKAO_USER_SUCCESS: "카카오 계정 확인 성공",
     CHECK_KAKAO_USER_FAIL: "카카오 계정 확인 실패",
+    ALREADY_USER: "이미 회원가입 된 유저입니다.",
     // user
     READ_USER_SUCCESS: "유저 조회 성공",
     READ_USER_FAIL: "유저 조회 실패",
