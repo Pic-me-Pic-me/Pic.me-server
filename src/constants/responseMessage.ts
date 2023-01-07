@@ -12,7 +12,8 @@ export default {
     ALREADY_NICKNAME: "이미 사용중인 닉네임입니다.",
     SOCIAL_SIGNIN_SUCCESS: "소셜 로그인 성공",
     SOCIAL_SIGNUP_SUCCESS: "소셜 회원가입 성공",
-
+    CHECK_KAKAO_USER_SUCCESS: "카카오 계정 확인 성공",
+    CHECK_KAKAO_USER_FAIL: "카카오 계정 확인 실패",
     // user
     READ_USER_SUCCESS: "유저 조회 성공",
     READ_USER_FAIL: "유저 조회 실패",
