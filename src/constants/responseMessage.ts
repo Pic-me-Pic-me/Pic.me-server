@@ -43,7 +43,7 @@ export default {
     CREATE_VOTE_SUCCESS: "투표 생성 성공",
     CREATE_VOTE_FAIL: "투표 생성 실패",
     CREATE_PICTURE_FAIL: "투표 내 사진 저장 실패",
-    GET_CURRENT_VOTE_FAIL: "현재 진행중인 투표들 로딩 실패",
+    NO_CURRENT_VOTE: "현재 진행중인 투표들 없음[null] ",
     GET_VOTE_FAIL: "사진과 스티커 갖고오기 실패",
     PLAYER_GET_VOTE_FAIL: "해당하는 투표가 없습니다.",
     PLAYER_GET_VOTE_RESULT_FAIL: "투표 결과를 받아올 수 없습니다.",
