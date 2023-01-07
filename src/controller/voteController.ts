@@ -48,6 +48,8 @@ const getSingleVote = async (req: Request, res: Response) => {
     const data = await voteService.getSingleVote(+voteId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { userId } = req.params;

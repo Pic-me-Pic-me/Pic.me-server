@@ -139,7 +139,7 @@ const getSingleVote = async (voteId: number) => {
             return DTOs;
         }) as object[],
     };
-
+    console.log(resultDTO);
     return resultDTO;
 };
 
@@ -175,7 +175,7 @@ const getCurrentVotes = async (userId: number) => {
         let DTOs = {
             voteId: value.id as number,
             title: value.title as string,
-            voteThumbnail: value.Picture[0].url as string,
+            voteThumbnail: value.Picture[0]?.url as string,
             createdAt: value.created_at as string,
             totalVoteCount: value.count as number,
         };
