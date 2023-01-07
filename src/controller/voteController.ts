@@ -24,6 +24,7 @@ const createVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
+
 const deleteVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
     //const refreshToken = req.body.refreshToken;
@@ -39,6 +40,22 @@ const deleteVote = async (req: Request, res: Response) => {
     const result = await voteService.deleteVote(userId, +voteId);
     if (result == sc.OK) return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
     return res.status(sc.DB_ERROR).send(fail(sc.DB_ERROR, rm.DELETE_USER_FAIL));
+}
+
+const getSingleVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const data = await voteService.getSingleVote(+voteId);
+
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
+}
+const getCurrentVotes = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    // const { userId } = req.body.uerId; //이게 맞음
+
+    const data = await voteService.getCurrentVotes(+userId);
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
 /*
@@ -55,10 +72,34 @@ const playerGetPictures = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
+const playerGetVotedResult = async (req: Request, res: Response) => {
+    const { pictureId } = req.params;
+
+    const data = await voteService.playerGetVotedResult(+pictureId);
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
+}
+
+const closeVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const { userId } = req.body;
+
+    const result = await voteService.closeVote(+voteId, userId);
+    if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
+    if (result == sc.UNAUTHORIZED) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
+};
+
 const voteController = {
     createVote,
     playerGetPictures,
     deleteVote,
+    getSingleVote,
+    playerGetVotedResult,
+    closeVote,
+    getCurrentVotes,
 };
 
 export default voteController;
