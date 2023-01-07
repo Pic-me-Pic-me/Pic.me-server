@@ -47,6 +47,7 @@ export default {
     GET_VOTE_FAIL: "사진과 스티커 갖고오기 실패",
     CLOSE_VOTE_FAIL: "투표 종료 실패",
     CLOSE_VOTE_SUCCESS: "투표 종료 성공",
+    ALREADY_CLOSED_VOTE: "이미 종료된 투표입니다.",
     VOTE_NOT_EXIST: "투표가 존재하지 않습니다",
     VOTE_NOT_ADMIN: "본인의 투표가 아닙니다",
     PLAYER_GET_VOTE_FAIL: "해당하는 투표가 없습니다.",

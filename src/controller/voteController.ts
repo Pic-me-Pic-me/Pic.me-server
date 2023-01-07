@@ -20,10 +20,10 @@ const createVote = async (req: Request, res: Response) => {
 
     const data = await voteService.createVote(+userId, voteDTO);
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
-    if (data == sc.BAD_REQUEST) return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
+    if (data == sc.BAD_REQUEST)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
-
 
 const deleteVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
@@ -35,19 +35,20 @@ const deleteVote = async (req: Request, res: Response) => {
     if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
     const vote = await voteService.findVoteById(userId, +voteId);
     if (!vote) return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NOT_VOTE_ID));
-    if (vote == sc.BAD_REQUEST) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_USER_NOT_EQUAL));
+    if (vote == sc.BAD_REQUEST)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_USER_NOT_EQUAL));
 
     const result = await voteService.deleteVote(userId, +voteId);
     if (result == sc.OK) return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
     return res.status(sc.DB_ERROR).send(fail(sc.DB_ERROR, rm.DELETE_USER_FAIL));
-}
+};
 
 const getSingleVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
     const data = await voteService.getSingleVote(+voteId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
-}
+};
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { userId } = req.params;
     // const { userId } = req.body.uerId; //이게 맞음
@@ -66,8 +67,10 @@ const playerGetPictures = async (req: Request, res: Response) => {
     const { voteId } = req.params;
 
     const data = await voteService.playerGetPictures(+voteId);
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
-    if (data.voteStatus == false) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_VOTE_ALREADY_END));
+    if (!data)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
+    if (data.voteStatus == false)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_VOTE_ALREADY_END));
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
@@ -76,10 +79,11 @@ const playerGetVotedResult = async (req: Request, res: Response) => {
     const { pictureId } = req.params;
 
     const data = await voteService.playerGetVotedResult(+pictureId);
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
+    if (!data)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
-}
+};
 
 const closeVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
@@ -87,7 +91,10 @@ const closeVote = async (req: Request, res: Response) => {
 
     const result = await voteService.closeVote(+voteId, userId);
     if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
-    if (result == sc.UNAUTHORIZED) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
+    if (result == sc.UNAUTHORIZED)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
+    if (result == sc.BAD_REQUEST)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_CLOSED_VOTE));
 
     return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
 };
