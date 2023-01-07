@@ -143,8 +143,9 @@ const getSingleVote = async (voteId: number) => {
     return resultDTO;
 };
 
-//페이징 처리 해야됨
 const getCurrentVotes = async (userId: number, cursorId: number) => {
+    console.log(userId, cursorId);
+
     const isFirstPage = !cursorId;
 
     const pageCondition = {
@@ -213,6 +214,11 @@ const playerGetPictures = async (voteId: number) => {
                     url: true,
                 },
             },
+            User: {
+                select: {
+                    user_name: true,
+                },
+            },
         },
         where: {
             id: voteId,
@@ -222,6 +228,7 @@ const playerGetPictures = async (voteId: number) => {
     if (!data) return null;
 
     const resultDTO: PlayerPicturesGetDTO = {
+        userName: data?.User.user_name as string,
         voteId: data?.id as number,
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
