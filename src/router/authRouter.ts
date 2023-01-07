@@ -29,6 +29,6 @@ router.post(
 router.post("/token", authController.tokenRefresh);
 router.post("/kakao", authController.createSocialUser); // 회원가입
 router.post("/kakao/check", authController.findSocialUser); // 카카오에 존재하는지
-router.post("/kakao/sigin", authController.loginSocialUser); //로그인
+router.post("/kakao/signin", authController.loginSocialUser); //로그인
 
 export default router;
