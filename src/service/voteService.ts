@@ -1,4 +1,5 @@
 import { PlayerPicturesGetDTO } from "./../interfaces/PlayerPicturesGetDTO";
+import { SingleVoteGetDTO } from "./../interfaces/SingleVoteGetDTO";
 import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO";
 import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
@@ -62,6 +63,64 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
     return data.id;
 };
 
+
+const getSingleVote = async (voteId: number) => {
+    const data = await prisma.vote.findUnique({
+        select: {
+            id: true,
+            status: true,
+            title: true,
+            count: true,
+            created_at: true,
+            Picture: {
+                select: {
+                    id: true,
+                    url: true,
+                    count: true,
+                    Sticker: {
+                        select: {
+                            sticker_location: true,
+                            emoji: true,
+                            count: true,
+                        },
+                    },
+                },
+            },
+        },
+        where: {
+            id: voteId,
+        },
+    });
+
+    if (!data) return null;
+
+    const resultDTO: SingleVoteGetDTO = {
+        voteId: data?.id as number,
+        voteStatus: data?.status as boolean,
+        voteTitle: data?.title as string,
+        currentVote: data?.count as number,
+        createdDate: data?.created_at as Date,
+        Picture: data?.Picture.map((value: any) => {
+            let DTOs = {
+                pictureId: value.id,
+                url: value.url,
+                count: value.count,
+                Sticker: value.Sticker.map((sticker: any) => {
+                    let stickerDTO = {
+                        stickerLocation: sticker.sticker_location,
+                        emoji: sticker.emoji,
+                        count: sticker.count,
+                    };
+                    return stickerDTO;
+                }),
+            };
+            return DTOs;
+        }) as object[],
+    };
+
+    return resultDTO;
+};
+
 //페이징 처리 해야됨
 const getCurrentVotes = async (userId: number) => {
     const data = await prisma.vote.findMany({
@@ -102,6 +161,8 @@ const getCurrentVotes = async (userId: number) => {
     });
     return result;
 };
+
+
 
 /*
     플레이어
@@ -178,8 +239,10 @@ const voteService = {
     createVote,
     closeVote,
     playerGetPictures,
+    getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
+
 };
 
 export default voteService;
