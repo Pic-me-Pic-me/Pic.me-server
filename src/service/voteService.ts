@@ -8,6 +8,7 @@ import { sc } from "../constants";
 import { rm } from "fs";
 import { title } from "process";
 import { stringMap } from "aws-sdk/clients/backup";
+import test from "node:test";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             title: voteDTO.title,
             status: voteDTO.status,
             count: voteDTO.count,
+            date: 20220301,
         },
     });
     if (!data) return null;
@@ -184,6 +186,70 @@ const getCurrentVotes = async (userId: number) => {
     return result;
 };
 
+const getVoteLibrary = async (userId: number) => {
+    const dates = await prisma.vote.groupBy({
+        by: ["date"],
+        where: {
+            user_id: userId,
+            status: false,
+        },
+        orderBy: {
+            date: "desc",
+        },
+    });
+
+    if (!dates) return null;
+
+    const result: object[] = await Promise.all(
+        dates.map(async (value: any) => {
+            const voteData = await prisma.vote.findMany({
+                where: {
+                    date: value.date as number,
+                    user_id: userId,
+                    status: false,
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    count: true,
+                    created_at: true,
+                    Picture: {
+                        select: {
+                            url: true,
+                        },
+                        orderBy: {
+                            count: "desc",
+                        },
+                    },
+                },
+                orderBy: {
+                    created_at: "desc",
+                },
+                take: 5,
+            });
+
+            const votes: object[] = [];
+            voteData.map((value: any) => {
+                value["url"] = value.Picture[0].url;
+                value["createdAt"] = value.created_at;
+                delete value.created_at;
+                delete value.Picture;
+
+                votes.push(value);
+            });
+
+            return {
+                date: value.date,
+                votes: voteData,
+            };
+        })
+    );
+
+    if (result.length == 0) return null;
+
+    return result;
+};
+
 /*
     플레이어
 */
@@ -264,6 +330,7 @@ const voteService = {
     getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
+    getVoteLibrary,
 };
 
 export default voteService;

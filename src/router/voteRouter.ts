@@ -12,6 +12,7 @@ router.get("/maker/singleResult/:voteId", voteController.getSingleVote); //라�
 
 router.patch("/close/:voteId", auth, voteController.closeVote);
 
+router.get("/all", auth, voteController.getVoteLibrary);
 
 router.get("/getCurrentVote/:userId", voteController.getCurrentVotes); //userId + auth 로직 필요??
 //라우팅 경로 고려

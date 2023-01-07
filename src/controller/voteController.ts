@@ -51,6 +51,7 @@ const getSingleVote = async (req: Request, res: Response) => {
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
+
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { userId } = req.params;
     // const { userId } = req.body.uerId; //이게 맞음
@@ -59,6 +60,14 @@ const getCurrentVotes = async (req: Request, res: Response) => {
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+};
+
+const getVoteLibrary = async (req: Request, res: Response) => {
+    const data = await voteService.getVoteLibrary(req.body.userId);
+
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.LIBRARY_GET_FAIL));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
 };
 
 /*
@@ -106,6 +115,7 @@ const voteController = {
     playerGetPictures,
     deleteVote,
     getSingleVote,
+    getVoteLibrary,
     playerGetVotedResult,
     closeVote,
     getCurrentVotes,
