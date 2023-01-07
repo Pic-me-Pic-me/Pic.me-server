@@ -43,13 +43,23 @@ export default {
     CREATE_VOTE_SUCCESS: "투표 생성 성공",
     CREATE_VOTE_FAIL: "투표 생성 실패",
     CREATE_PICTURE_FAIL: "투표 내 사진 저장 실패",
-    GET_CURRENT_VOTE_FAIL: "현재 진행중인 투표들 로딩 실패",
+    NO_CURRENT_VOTE: "현재 진행중인 투표들 없음[null] ",
     GET_VOTE_FAIL: "사진과 스티커 갖고오기 실패",
+    CLOSE_VOTE_FAIL: "투표 종료 실패",
+    CLOSE_VOTE_SUCCESS: "투표 종료 성공",
+    VOTE_NOT_EXIST: "투표가 존재하지 않습니다",
+    VOTE_NOT_ADMIN: "본인의 투표가 아닙니다",
     PLAYER_GET_VOTE_FAIL: "해당하는 투표가 없습니다.",
     PLAYER_GET_VOTE_RESULT_FAIL: "투표 결과를 받아올 수 없습니다.",
     PLAYER_GET_VOTE_SUCCESS: "투표 결과를 갖고 왔습니다.",
     PLAYER_VOTE_ALREADY_END: "이미 투표가 끝났습니다.",
     PLAYER_GET_VOTED_RESULT_SUCCESS: "투표와 스티커 가져오기를 성공 했습니다.",
+
+    //sticker
+    CREATE_STICKER_SUCCESS: "스티커 생성 성공",
+    STICKER_COUNT_EXCEED: "스티커 개수가 초과되었습니다.",
+    STICKER_TRANSCTION_FAIL: "스티커 트랜잭션 실패",
+    PICTURE_NOT_EXIST: "사진이 없습니다.",
 
     // server error
     INTERNAL_SERVER_ERROR: "서버 내 오류",

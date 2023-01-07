@@ -24,6 +24,16 @@ const createVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
+const getCurrentVotes = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    // const { userId } = req.body.uerId; //이게 맞음
+
+    const data = await voteService.getCurrentVotes(+userId);
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+};
+
 /*
  [ 플레이어 ]
 */
@@ -45,12 +55,25 @@ const playerGetVotedResult = async (req: Request, res: Response) => {
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
+}
+
+const closeVote = async (req: Request, res: Response) => {
+    const { voteId } = req.params;
+    const { userId } = req.body;
+
+    const result = await voteService.closeVote(+voteId, userId);
+    if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
+    if (result == sc.UNAUTHORIZED) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
 };
 
 const voteController = {
     createVote,
     playerGetPictures,
     playerGetVotedResult,
+    closeVote,
+    getCurrentVotes,
 };
 
 export default voteController;

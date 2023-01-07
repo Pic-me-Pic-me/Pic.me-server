@@ -10,12 +10,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     if (!token) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EMPTY_TOKEN));
 
     try {
-        const decoded = jwtHandler.verify(token); 
+        const decoded = jwtHandler.verify(token);
 
-        if (decoded === tokenType.TOKEN_EXPIRED)
-            return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
-        if (decoded === tokenType.TOKEN_INVALID)
-            return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+        if (decoded === tokenType.TOKEN_EXPIRED) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
+        if (decoded === tokenType.TOKEN_INVALID) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
 
         const userId: number = (decoded as JwtPayload).userId;
         if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
