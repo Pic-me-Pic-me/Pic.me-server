@@ -13,8 +13,17 @@ const getUserInfo = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.GET_USER_INFO, data));
 };
 
+const checkUserName = async (req: Request, res: Response) => {
+    const { userName } = req.query;
+    const result = await userService.checkUserName(userName as string);
+
+    if (result == sc.OK) return res.status(sc.OK).send(success(sc.OK, rm.UNIQUE_USER_NAME));
+    return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, "중복된 아이디가 있습니다."));
+};
+
 const userController = {
     getUserInfo,
+    checkUserName,
 };
 
 export default userController;

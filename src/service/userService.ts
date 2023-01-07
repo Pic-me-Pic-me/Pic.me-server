@@ -1,9 +1,4 @@
-import { PlayerPicturesGetDTO } from "./../interfaces/PlayerPicturesGetDTO";
-import { SingleVoteGetDTO } from "./../interfaces/SingleVoteGetDTO";
-import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO";
-import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
-import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
-import { Picture, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
 import { GetUserInfoDTO } from "../interfaces/GetUserInfoDTO";
 
@@ -30,8 +25,21 @@ const getUserInfo = async (userId: number) => {
     return resultDTO;
 };
 
+const checkUserName = async (userName: string) => {
+    const data = await prisma.user.findFirst({
+        where: {
+            user_name: userName,
+        },
+    });
+    console.log(data);
+    if (!data) return sc.OK;
+
+    if (data) return sc.CONFLICT;
+};
+
 const userService = {
     getUserInfo,
+    checkUserName,
 };
 
 export default userService;
