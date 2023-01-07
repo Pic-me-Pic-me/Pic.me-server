@@ -1,3 +1,4 @@
+import { SocialUser } from "./../interfaces/SocialUserDTO";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
@@ -88,9 +89,10 @@ const getUser = async (social: string, token: string) => {
 };
 
 const findByKey = async (kakaoId: string, socialType: string) => {
-    const auth = await prisma.authenticationProvider.findUnique({
+    const auth = await prisma.authenticationProvider.findFirst({
         where: {
             id: kakaoId,
+            provider_type: socialType,
         },
     });
     if (!auth) return null;
