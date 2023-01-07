@@ -6,6 +6,8 @@ const router: Router = Router();
 
 router.post("/:userId", upload.array("file"), voteController.createVote);
 
+router.delete("/:voteId", voteController.deleteVote);
+
 router.get("/maker/singleResult/:voteId", voteController.getSingleVote); //라우터 경로 추천좀
 
 router.patch("/close/:voteId", auth, voteController.closeVote);

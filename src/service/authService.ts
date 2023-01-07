@@ -142,6 +142,15 @@ const tokenRefresh = async (userId: number, refreshToken: String) => {
     return accessToken;
 };
 
+const findByRefreshToken = async (refreshToken: string) => {
+    const user = await prisma.user.findFirst({
+        where: {
+            refresh_token: refreshToken,
+        },
+    });
+    return user;
+};
+
 const authService = {
     createUser,
     signIn,
@@ -151,6 +160,7 @@ const authService = {
     createSocialUser,
     updateRefreshToken,
     tokenRefresh,
+    findByRefreshToken,
 };
 
 export default authService;

@@ -5,6 +5,7 @@ import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
+import { rm } from "fs";
 import { title } from "process";
 import { stringMap } from "aws-sdk/clients/backup";
 
@@ -61,6 +62,27 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
     });
     if (!data) return null;
     return data.id;
+};
+
+const deleteVote = async (userId: number, voteId: number) => {
+    await prisma.vote.delete({
+         where: {
+            id: voteId,
+        },
+    });
+    return sc.OK;
+};
+
+
+const findVoteById = async (userId: number, voteId: number) => {
+    const vote = await prisma.vote.findUnique({
+        where: {
+            id: voteId,
+        },
+    });
+    if (!vote) return null;
+    if (vote.user_id != userId) return sc.BAD_REQUEST;
+    return vote;
 };
 
 
@@ -120,6 +142,7 @@ const getSingleVote = async (voteId: number) => {
 
     return resultDTO;
 };
+
 
 //페이징 처리 해야됨
 const getCurrentVotes = async (userId: number) => {
@@ -239,10 +262,11 @@ const voteService = {
     createVote,
     closeVote,
     playerGetPictures,
+    findVoteById,
+    deleteVote,
     getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
-
 };
 
 export default voteService;
