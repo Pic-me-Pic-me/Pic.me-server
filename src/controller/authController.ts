@@ -101,7 +101,7 @@ const createSocialUser = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
 };
 
-const findSocialUSer = async (req: Request, res: Response) => {
+const findSocialUser = async (req: Request, res: Response) => {
     // 중복확인 - 이미 존재하는 사용자인지.아 여기서 카카오한테 보내기
     const social = req.body.socialType;
     const token = req.body.token;
@@ -111,28 +111,21 @@ const findSocialUSer = async (req: Request, res: Response) => {
 
     const user = await authService.getUser(social, token);
 
-    if (!user)
-        // 토큰이 없는 경우
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (!user) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
     if (user == rm.NO_SOCIAL_TYPE)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
     if (user == rm.NO_SOCIAL_USER)
-        //소셜에 있는 사용자가 아닌 경우
         return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
-    const existUser = await authService.findByKey((user as SocialUser).userId, social);
-
-    if (!existUser) {
-        const data = {
-            uid: (user as SocialUser).userId,
-            isUser: false,
-        };
-        return res.status(sc.OK).send(success(sc.OK, rm.IS_SOCIAL_USER, data));
-    }
-    const data = {
+    const existUser = await authService.findByKey(String((user as SocialUser).userId), social);
+    let data = {
         uid: (user as SocialUser).userId,
         isUser: true,
     };
-    return res.status(sc.OK).send(success(sc.OK, rm.IS_SOCIAL_USER, data));
+    if (!existUser) {
+        data.isUser = false;
+        return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
+    }
+    return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
 };
 
 const loginSocialUser = async (req: Request, res: Response) => {
@@ -204,7 +197,7 @@ const authController = {
     signInUser,
     tokenRefresh,
     createSocialUser,
-    findSocialUSer,
+    findSocialUser,
     loginSocialUser,
 };
 
