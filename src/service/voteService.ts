@@ -1,8 +1,12 @@
 import { PlayerPicturesGetDTO } from "./../interfaces/PlayerPicturesGetDTO";
 import { SingleVoteGetDTO } from "./../interfaces/SingleVoteGetDTO";
+import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO";
+import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
+import { title } from "process";
+import { stringMap } from "aws-sdk/clients/backup";
 
 const prisma = new PrismaClient();
 
@@ -22,6 +26,31 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     return data;
 };
 
+const closeVote = async (voteId: number, userId: number) => {
+    const vote = await prisma.vote.findUnique({
+        where: {
+            id: voteId,
+        },
+    });
+
+    if (!vote) return null;
+
+    if (vote.user_id != userId) return sc.UNAUTHORIZED;
+
+    const data = await prisma.vote.update({
+        where: {
+            id: voteId,
+        },
+        data: {
+            status: false,
+        },
+    });
+
+    if (!data) return null;
+
+    return data.id;
+};
+
 const createPictures = async (voteId: number, pictureUrl: string) => {
     const data = await prisma.picture.create({
         data: {
@@ -33,6 +62,7 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
     if (!data) return null;
     return data.id;
 };
+
 
 const getSingleVote = async (voteId: number) => {
     const data = await prisma.vote.findUnique({
@@ -90,6 +120,50 @@ const getSingleVote = async (voteId: number) => {
 
     return resultDTO;
 };
+
+//페이징 처리 해야됨
+const getCurrentVotes = async (userId: number) => {
+    const data = await prisma.vote.findMany({
+        select: {
+            id: true,
+            title: true,
+            created_at: true,
+            count: true,
+            Picture: {
+                select: {
+                    url: true,
+                },
+                orderBy: {
+                    count: "desc",
+                },
+            },
+        },
+        where: {
+            user_id: userId,
+            status: true,
+        },
+        orderBy: {
+            id: "desc",
+        },
+    });
+    console.log(typeof data[0]);
+    console.log(data[0]);
+
+    const result: CurrentVotesGetDTO[] = data.map((value: any) => {
+        let DTOs = {
+            voteId: value.id as number,
+            title: value.title as string,
+            voteThumbnail: value.Picture[0].url as string,
+            createdAt: value.created_at as string,
+            totalVoteCount: value.count as number,
+        };
+        return DTOs;
+    });
+    return result;
+};
+
+
+
 /*
     플레이어
 */
@@ -123,10 +197,52 @@ const playerGetPictures = async (voteId: number) => {
     return resultDTO;
 };
 
+const playerGetVotedResult = async (pictureId: number) => {
+    const data = await prisma.picture.findUnique({
+        select: {
+            id: true,
+            url: true,
+            count: true,
+            Sticker: {
+                select: {
+                    sticker_location: true,
+                    emoji: true,
+                    count: true,
+                },
+            },
+        },
+        where: {
+            id: pictureId,
+        },
+    });
+    if (!data) return null;
+
+    const resultDTO: PlayerGetVotedResultDTO = {
+        Picture: {
+            pictureId: data?.id,
+            url: data.url,
+            count: data.count,
+        },
+        Sticker: data.Sticker.map((value: any) => {
+            let DTOs = {
+                stickerLocation: value.sticker_location as string,
+                emoji: value.emoji as number,
+                count: value.count as number,
+            };
+            return DTOs;
+        }),
+    };
+    return resultDTO;
+};
+
 const voteService = {
     createVote,
+    closeVote,
     playerGetPictures,
     getSingleVote,
+    playerGetVotedResult,
+    getCurrentVotes,
+
 };
 
 export default voteService;
