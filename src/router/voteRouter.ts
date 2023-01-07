@@ -6,7 +6,7 @@ const router: Router = Router();
 
 router.post("/:userId", upload.array("file"), voteController.createVote);
 
-router.delete("/close/:voteId", auth, voteController.closeVote);
+router.patch("/close/:voteId", auth, voteController.closeVote);
 
 /*
     플레이어
