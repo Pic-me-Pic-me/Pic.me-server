@@ -76,25 +76,16 @@ const createSocialUser = async (req: Request, res: Response) => {
     const uid = req.body.uid; // 카카오 아이디
     const social = req.body.socialType;
     const nickname = req.body.userName;
-    let existUser = await authService.findByKey(uid, social);
+    const email = req.body.email;
+    let existUser = await authService.findByKey(String(uid), social);
 
-    if (existUser)
-        return res
-            .status(sc.BAD_REQUEST)
-            .send(fail(sc.BAD_REQUEST, "이미 회원가입 된 소셜 유저입니다."));
+    if (existUser) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
 
-    const kakaoUser = await authService.getUser(uid, social);
-
-    if (!kakaoUser)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, "소셜 유저가 아빈디ㅏ"));
-    const data = await authService.createSocialUser(
-        (kakaoUser as SocialUser).email as string,
-        nickname,
-        uid
-    );
+    const data = await authService.createSocialUser(email, nickname, uid);
     const accessToken = jwtHandler.sign(data.id);
     const result = {
         id: data.id,
+        userName: nickname,
         accessToken: accessToken,
         refreshToken: data.refresh_token,
     };
@@ -119,6 +110,7 @@ const findSocialUser = async (req: Request, res: Response) => {
     const existUser = await authService.findByKey(String((user as SocialUser).userId), social);
     let data = {
         uid: (user as SocialUser).userId,
+        email: (user as SocialUser).email,
         isUser: true,
     };
     if (!existUser) {
@@ -129,17 +121,14 @@ const findSocialUser = async (req: Request, res: Response) => {
 };
 
 const loginSocialUser = async (req: Request, res: Response) => {
-    // 로그인하기 - 토큰 재발급
-    const userId = req.body.uid; //카카오 아이디로 id찾기
+    const userId = req.body.uid;
     const social = req.body.socialType;
     if (!userId || !social)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
-    const existUser = await authService.findByKey(userId, social);
+    const existUser = await authService.findByKey(String(userId), social);
 
     if (!existUser)
-        return res
-            .status(sc.UNAUTHORIZED)
-            .send(fail(sc.UNAUTHORIZED, "회원가입 하지 않은 소셜 유저입니다."));
+        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.CHECK_KAKAO_USER_FAIL));
 
     const updatedUser = await authService.updateRefreshToken(existUser.id);
     const accessToken = jwtHandler.sign(updatedUser.id);
