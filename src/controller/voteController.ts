@@ -51,13 +51,13 @@ const getSingleVote = async (req: Request, res: Response) => {
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
+
 const getCurrentVotes = async (req: Request, res: Response) => {
-    const { userId } = req.params;
-    // const { userId } = req.body.uerId; //이게 맞음
+    const { userId, cursorId } = req.params;
 
-    const data = await voteService.getCurrentVotes(+userId);
+    const data = await voteService.getCurrentVotes(+userId, +cursorId);
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
-
+    console.log(data);
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
@@ -101,6 +101,12 @@ const closeVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
 };
 
+const pagingExample = async (req: Request, res: Response) => {
+    const result = await voteService.paging(22);
+    if (!result) return;
+    return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS, result));
+};
+
 const voteController = {
     createVote,
     playerGetPictures,
@@ -109,6 +115,7 @@ const voteController = {
     playerGetVotedResult,
     closeVote,
     getCurrentVotes,
+    pagingExample,
 };
 
 export default voteController;

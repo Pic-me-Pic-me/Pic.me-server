@@ -144,7 +144,16 @@ const getSingleVote = async (voteId: number) => {
 };
 
 //페이징 처리 해야됨
-const getCurrentVotes = async (userId: number) => {
+const getCurrentVotes = async (userId: number, cursorId: number) => {
+    const isFirstPage = !cursorId;
+
+    const pageCondition = {
+        skip: 1,
+        cursor: {
+            id: cursorId as number,
+        },
+    };
+
     const data = await prisma.vote.findMany({
         select: {
             id: true,
@@ -167,9 +176,11 @@ const getCurrentVotes = async (userId: number) => {
         orderBy: {
             id: "desc",
         },
+        take: 5,
+        ...(!isFirstPage && pageCondition),
     });
-    console.log(typeof data[0]);
-    console.log(data[0]);
+
+    if (data.length == 0) return null;
 
     const result: CurrentVotesGetDTO[] = data.map((value: any) => {
         let DTOs = {
@@ -181,7 +192,14 @@ const getCurrentVotes = async (userId: number) => {
         };
         return DTOs;
     });
-    return result;
+
+    const length = data.length;
+    if (length < 0) {
+        return undefined;
+    }
+
+    const resCursorId = data[data.length - 1].id;
+    return { result, resCursorId };
 };
 
 /*
@@ -255,6 +273,30 @@ const playerGetVotedResult = async (pictureId: number) => {
     return resultDTO;
 };
 
+const paging = async (cursorId: number) => {
+    const isFirstPage = !cursorId;
+    console.log(isFirstPage);
+
+    const pageCondition = {
+        skip: 1,
+        cursor: {
+            id: cursorId as number,
+        },
+    };
+
+    const userList = await prisma.picture.findMany({
+        take: 5,
+        ...(!isFirstPage && pageCondition),
+    });
+    const length = userList.length;
+    if (length < 0) {
+        return undefined;
+    }
+    console.log(userList);
+    console.log(userList[userList.length - 1].id);
+    return userList[userList.length - 1].id;
+};
+
 const voteService = {
     createVote,
     closeVote,
@@ -264,6 +306,7 @@ const voteService = {
     getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
+    paging,
 };
 
 export default voteService;
