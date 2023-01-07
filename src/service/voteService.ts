@@ -66,13 +66,12 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
 
 const deleteVote = async (userId: number, voteId: number) => {
     await prisma.vote.delete({
-         where: {
+        where: {
             id: voteId,
         },
     });
     return sc.OK;
 };
-
 
 const findVoteById = async (userId: number, voteId: number) => {
     const vote = await prisma.vote.findUnique({
@@ -84,7 +83,6 @@ const findVoteById = async (userId: number, voteId: number) => {
     if (vote.user_id != userId) return sc.BAD_REQUEST;
     return vote;
 };
-
 
 const getSingleVote = async (voteId: number) => {
     const data = await prisma.vote.findUnique({
@@ -139,10 +137,9 @@ const getSingleVote = async (voteId: number) => {
             return DTOs;
         }) as object[],
     };
-
+    console.log(resultDTO);
     return resultDTO;
 };
-
 
 //페이징 처리 해야됨
 const getCurrentVotes = async (userId: number) => {
@@ -176,7 +173,7 @@ const getCurrentVotes = async (userId: number) => {
         let DTOs = {
             voteId: value.id as number,
             title: value.title as string,
-            voteThumbnail: value.Picture[0].url as string,
+            voteThumbnail: value.Picture[0]?.url as string,
             createdAt: value.created_at as string,
             totalVoteCount: value.count as number,
         };
@@ -184,8 +181,6 @@ const getCurrentVotes = async (userId: number) => {
     });
     return result;
 };
-
-
 
 /*
     플레이어
