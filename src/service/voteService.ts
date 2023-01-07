@@ -193,11 +193,6 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
         return DTOs;
     });
 
-    const length = data.length;
-    if (length < 0) {
-        return undefined;
-    }
-
     const resCursorId = data[data.length - 1].id;
     return { result, resCursorId };
 };
@@ -273,30 +268,6 @@ const playerGetVotedResult = async (pictureId: number) => {
     return resultDTO;
 };
 
-const paging = async (cursorId: number) => {
-    const isFirstPage = !cursorId;
-    console.log(isFirstPage);
-
-    const pageCondition = {
-        skip: 1,
-        cursor: {
-            id: cursorId as number,
-        },
-    };
-
-    const userList = await prisma.picture.findMany({
-        take: 5,
-        ...(!isFirstPage && pageCondition),
-    });
-    const length = userList.length;
-    if (length < 0) {
-        return undefined;
-    }
-    console.log(userList);
-    console.log(userList[userList.length - 1].id);
-    return userList[userList.length - 1].id;
-};
-
 const voteService = {
     createVote,
     closeVote,
@@ -306,7 +277,6 @@ const voteService = {
     getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
-    paging,
 };
 
 export default voteService;
