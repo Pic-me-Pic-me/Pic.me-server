@@ -1,7 +1,10 @@
 import { PlayerPicturesGetDTO } from "./../interfaces/PlayerPicturesGetDTO";
+import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
+import { title } from "process";
+import { stringMap } from "aws-sdk/clients/backup";
 
 const prisma = new PrismaClient();
 
@@ -58,6 +61,47 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
     return data.id;
 };
 
+//페이징 처리 해야됨
+const getCurrentVotes = async (userId: number) => {
+    const data = await prisma.vote.findMany({
+        select: {
+            id: true,
+            title: true,
+            created_at: true,
+            count: true,
+            Picture: {
+                select: {
+                    url: true,
+                },
+                orderBy: {
+                    count: "desc",
+                },
+            },
+        },
+        where: {
+            user_id: userId,
+            status: true,
+        },
+        orderBy: {
+            id: "desc",
+        },
+    });
+    console.log(typeof data[0]);
+    console.log(data[0]);
+
+    const result: CurrentVotesGetDTO[] = data.map((value: any) => {
+        let DTOs = {
+            voteId: value.id as number,
+            title: value.title as string,
+            voteThumbnail: value.Picture[0].url as string,
+            createdAt: value.created_at as string,
+            totalVoteCount: value.count as number,
+        };
+        return DTOs;
+    });
+    return result;
+};
+
 /*
     플레이어
 */
@@ -95,6 +139,7 @@ const voteService = {
     createVote,
     closeVote,
     playerGetPictures,
+    getCurrentVotes,
 };
 
 export default voteService;

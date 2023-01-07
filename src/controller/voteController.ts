@@ -24,6 +24,16 @@ const createVote = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
 };
 
+const getCurrentVotes = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    // const { userId } = req.body.uerId; //이게 맞음
+
+    const data = await voteService.getCurrentVotes(+userId);
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+};
+
 /*
  [ 플레이어 ]
 */
@@ -53,6 +63,7 @@ const voteController = {
     createVote,
     playerGetPictures,
     closeVote,
+    getCurrentVotes,
 };
 
 export default voteController;
