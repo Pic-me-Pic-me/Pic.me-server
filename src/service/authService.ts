@@ -85,6 +85,7 @@ const getEmailById = async (id: number) => {
 const getUser = async (social: string, token: string) => {
     if (social != socialType.KAKAO) return rm.NO_SOCIAL_TYPE;
     const user = await kakaoAuth(token);
+    if (!user) return null;
     return user;
 };
 
