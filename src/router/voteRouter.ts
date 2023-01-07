@@ -18,4 +18,5 @@ router.get("/getCurrentVote/:userId", voteController.getCurrentVotes); //userId 
 
 router.get("/:voteId", voteController.playerGetPictures);
 
+router.get("/player/:pictureId", voteController.playerGetVotedResult); //라우터 추천좀
 export default router;

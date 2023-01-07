@@ -48,6 +48,15 @@ const playerGetPictures = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
+const playerGetVotedResult = async (req: Request, res: Response) => {
+    const { pictureId } = req.params;
+
+    const data = await voteService.playerGetVotedResult(+pictureId);
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
+
+    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
+}
+
 const closeVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
     const { userId } = req.body;
@@ -62,6 +71,7 @@ const closeVote = async (req: Request, res: Response) => {
 const voteController = {
     createVote,
     playerGetPictures,
+    playerGetVotedResult,
     closeVote,
     getCurrentVotes,
 };

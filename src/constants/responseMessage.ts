@@ -53,6 +53,7 @@ export default {
     PLAYER_GET_VOTE_RESULT_FAIL: "투표 결과를 받아올 수 없습니다.",
     PLAYER_GET_VOTE_SUCCESS: "투표 결과를 갖고 왔습니다.",
     PLAYER_VOTE_ALREADY_END: "이미 투표가 끝났습니다.",
+    PLAYER_GET_VOTED_RESULT_SUCCESS: "투표와 스티커 가져오기를 성공 했습니다.",
 
     //sticker
     CREATE_STICKER_SUCCESS: "스티커 생성 성공",
