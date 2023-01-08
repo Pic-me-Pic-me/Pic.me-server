@@ -24,6 +24,7 @@ model Vote {
   title      String    @db.VarChar(25)
   count      Int
   created_at DateTime  @default(now())
+  date       Int
   Picture    Picture[]
   User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "vote_user_user_id_fk")
 }

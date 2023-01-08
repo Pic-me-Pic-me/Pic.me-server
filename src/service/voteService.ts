@@ -5,11 +5,21 @@ import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
-import { rm } from "fs";
-import { title } from "process";
-import { stringMap } from "aws-sdk/clients/backup";
 
 const prisma = new PrismaClient();
+
+const refineVoteDate = async (voteData: object[]) => {
+    voteData.map((value: any) => {
+        if (value.Picture.length != 0) value["url"] = value.Picture[0].url;
+        else value["url"] = "";
+
+        value["createdAt"] = value.created_at;
+        delete value.created_at;
+        delete value.Picture;
+    });
+
+    return voteData;
+};
 
 const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     const data = await prisma.vote.create({
@@ -18,6 +28,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             title: voteDTO.title,
             status: voteDTO.status,
             count: voteDTO.count,
+            date: 20220301,
         },
     });
     if (!data) return null;
@@ -139,7 +150,7 @@ const getSingleVote = async (voteId: number) => {
             return DTOs;
         }) as object[],
     };
-    console.log(resultDTO);
+
     return resultDTO;
 };
 
@@ -161,6 +172,7 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
             title: true,
             created_at: true,
             count: true,
+            date: true,
             Picture: {
                 select: {
                     url: true,
@@ -196,6 +208,94 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
 
     const resCursorId = data[data.length - 1].id;
     return { result, resCursorId };
+};
+
+const getVoteLibrary = async (userId: number) => {
+    const dates = await prisma.vote.groupBy({
+        by: ["date"],
+        where: {
+            user_id: userId,
+            status: false,
+        },
+        orderBy: {
+            date: "desc",
+        },
+    });
+
+    if (dates.length == 0) return dates;
+
+    const result: object[] = await Promise.all(
+        dates.map(async (value: any) => {
+            const voteData = await prisma.vote.findMany({
+                where: {
+                    date: value.date as number,
+                    user_id: userId,
+                    status: false,
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    count: true,
+                    created_at: true,
+                    Picture: {
+                        select: {
+                            url: true,
+                        },
+                        orderBy: {
+                            count: "desc",
+                        },
+                    },
+                },
+                orderBy: {
+                    created_at: "desc",
+                },
+                take: 5,
+            });
+
+            await refineVoteDate(voteData);
+
+            return {
+                date: value.date,
+                votes: voteData,
+            };
+        })
+    );
+
+    return result;
+};
+
+const getVoteReaminder = async (userId: number, date: number, flag: number) => {
+    let voteData = await prisma.vote.findMany({
+        where: {
+            date: date as number,
+            user_id: userId,
+            status: false,
+        },
+        select: {
+            id: true,
+            title: true,
+            count: true,
+            created_at: true,
+            Picture: {
+                select: {
+                    url: true,
+                },
+                orderBy: {
+                    count: "desc",
+                },
+            },
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+        take: 5,
+        skip: 1,
+        cursor: { id: flag },
+    });
+
+    await refineVoteDate(voteData);
+
+    return voteData;
 };
 
 /*
@@ -284,6 +384,8 @@ const voteService = {
     getSingleVote,
     playerGetVotedResult,
     getCurrentVotes,
+    getVoteLibrary,
+    getVoteReaminder,
 };
 
 export default voteService;
