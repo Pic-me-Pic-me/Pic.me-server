@@ -31,6 +31,9 @@ export default {
     SOCIAL_LOGIN_SUCCESS: "소셜 로그인 성공",
     INVALID_PASSWORD: "잘못된 비밀번호입니다.",
     INVALID_EMAIL: "잘못된 이메일입니다.",
+    CANT_GET_USERINFO: "유저 아이디를 갖고올 수 없습니다.",
+    GET_USER_INFO: "유저 정보 갖고오기 성공",
+    UNIQUE_USER_NAME: "중복 검사 완료! 중복되는 이름이 없습니다. ",
 
     // token
     CREATE_TOKEN_SUCCESS: "토큰 재발급 성공",
