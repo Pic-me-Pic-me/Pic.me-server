@@ -64,7 +64,7 @@ const getCurrentVotes = async (req: Request, res: Response) => {
 const getVoteLibrary = async (req: Request, res: Response) => {
     const data = await voteService.getVoteLibrary(req.body.userId);
 
-    if (data.length == 0) res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, data));
+    if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, data));
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
 };
 
