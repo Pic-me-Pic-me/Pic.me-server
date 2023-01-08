@@ -52,8 +52,8 @@ const getSingleVote = async (req: Request, res: Response) => {
 
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { cursorId } = req.params;
-    const { userId } = req.body;
-    const data = await voteService.getCurrentVotes(+userId, +cursorId);
+
+    const data = await voteService.getCurrentVotes(+req.body.userId, +cursorId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
 
@@ -61,7 +61,11 @@ const getCurrentVotes = async (req: Request, res: Response) => {
 };
 
 const getVoteLibrary = async (req: Request, res: Response) => {
-    const data = await voteService.getVoteLibrary(req.body.userId);
+    const { flag } = req.query;
+
+    if (!flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+
+    const data = await voteService.getVoteLibrary(req.body.userId, +flag);
 
     if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, data));
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
