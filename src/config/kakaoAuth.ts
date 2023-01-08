@@ -18,7 +18,6 @@ export default async (kakaoAccessToken: string) => {
         let email = "";
 
         if (user.data.kakao_account.email) email = user.data.kakao_account.email;
-
         const kakaoUser: SocialUser = {
             userId: userId,
             email: email,

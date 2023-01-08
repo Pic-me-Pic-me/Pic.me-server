@@ -27,8 +27,6 @@ const createVote = async (req: Request, res: Response) => {
 
 const deleteVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-    //const refreshToken = req.body.refreshToken;
-    //const user = await authService.findByRefreshToken(refreshToken);
 
     const userId = req.body.userId;
     if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
