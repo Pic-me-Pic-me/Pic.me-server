@@ -37,9 +37,27 @@ const checkUserName = async (userName: string) => {
     if (data) return sc.CONFLICT;
 };
 
+const deleteUser = async (userId: number) => {
+    const check = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
+    });
+
+    if (!check) return sc.NOT_FOUND;
+
+    await prisma.user.delete({
+        where: {
+            id: userId,
+        },
+    });
+    return sc.OK;
+};
+
 const userService = {
     getUserInfo,
     checkUserName,
+    deleteUser,
 };
 
 export default userService;
