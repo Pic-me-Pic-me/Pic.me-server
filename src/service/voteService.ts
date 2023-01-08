@@ -27,8 +27,8 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
         data: {
             user_id: userId,
             title: voteDTO.title,
-            status: voteDTO.status,
-            count: voteDTO.count,
+            status: false,
+            count: 0,
             date: +dayjs().format("YYYYMM"),
         },
     });
@@ -36,7 +36,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
 
     if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
     if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
-    return data;
+    return data.id;
 };
 
 const closeVote = async (voteId: number, userId: number) => {
@@ -211,8 +211,8 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
     return { result, resCursorId };
 };
 
-const getVoteLibrary = async (userId: number) => {
-    const dates = await prisma.vote.groupBy({
+const getVoteLibrary = async (userId: number, flag: number) => {
+    let dates = await prisma.vote.groupBy({
         by: ["date"],
         where: {
             user_id: userId,
@@ -224,6 +224,13 @@ const getVoteLibrary = async (userId: number) => {
     });
 
     if (dates.length == 0) return dates;
+
+    if (flag == 0) {
+        dates = dates.splice(0, 3);
+    } else {
+        const index = dates.findIndex((data) => data.date === flag);
+        dates = dates.splice(index + 1, 3);
+    }
 
     const result: object[] = await Promise.all(
         dates.map(async (value: any) => {
