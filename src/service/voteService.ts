@@ -3,11 +3,8 @@ import { SingleVoteGetDTO } from "./../interfaces/SingleVoteGetDTO";
 import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO";
 import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
-import { Picture, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
-import { rm } from "fs";
-import { title } from "process";
-import { stringMap } from "aws-sdk/clients/backup";
 import dayjs from "dayjs";
 
 const prisma = new PrismaClient();
