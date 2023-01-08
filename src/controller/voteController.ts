@@ -5,7 +5,7 @@ import { fail, success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
 
 const createVote = async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
     const locations = images.map((image: Express.MulterS3.File) => {
@@ -22,7 +22,7 @@ const createVote = async (req: Request, res: Response) => {
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
     if (data == sc.BAD_REQUEST)
         return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
-    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
+    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS, data));
 };
 
 const deleteVote = async (req: Request, res: Response) => {

@@ -4,7 +4,7 @@ import { upload, auth } from "../middlewares";
 
 const router: Router = Router();
 
-router.post("/:userId", auth, upload.array("file"), voteController.createVote);
+router.post("/", upload.array("file"), auth, voteController.createVote);
 
 router.get("/getCurrentVote/:cursorId", auth, voteController.getCurrentVotes); // auth 로직 필요??
 

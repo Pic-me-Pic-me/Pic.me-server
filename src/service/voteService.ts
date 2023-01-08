@@ -29,14 +29,14 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             title: voteDTO.title,
             status: false,
             count: 0,
-            date: 202211,
+            date: +dayjs().format("YYYYMM"),
         },
     });
     if (!data) return null;
 
     if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
     if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
-    return data;
+    return data.id;
 };
 
 const closeVote = async (voteId: number, userId: number) => {
