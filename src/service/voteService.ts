@@ -154,8 +154,18 @@ const getSingleVote = async (voteId: number) => {
     return resultDTO;
 };
 
-//페이징 처리 해야됨
-const getCurrentVotes = async (userId: number) => {
+const getCurrentVotes = async (userId: number, cursorId: number) => {
+    console.log(userId, cursorId);
+
+    const isFirstPage = !cursorId;
+
+    const pageCondition = {
+        skip: 1,
+        cursor: {
+            id: cursorId as number,
+        },
+    };
+
     const data = await prisma.vote.findMany({
         select: {
             id: true,
@@ -179,9 +189,11 @@ const getCurrentVotes = async (userId: number) => {
         orderBy: {
             id: "desc",
         },
+        take: 5,
+        ...(!isFirstPage && pageCondition),
     });
-    console.log(typeof data[0]);
-    console.log(data[0]);
+
+    if (data.length == 0) return null;
 
     const result: CurrentVotesGetDTO[] = data.map((value: any) => {
         let DTOs = {
@@ -193,7 +205,9 @@ const getCurrentVotes = async (userId: number) => {
         };
         return DTOs;
     });
-    return result;
+
+    const resCursorId = data[data.length - 1].id;
+    return { result, resCursorId };
 };
 
 const getVoteLibrary = async (userId: number) => {
@@ -300,6 +314,11 @@ const playerGetPictures = async (voteId: number) => {
                     url: true,
                 },
             },
+            User: {
+                select: {
+                    user_name: true,
+                },
+            },
         },
         where: {
             id: voteId,
@@ -309,6 +328,7 @@ const playerGetPictures = async (voteId: number) => {
     if (!data) return null;
 
     const resultDTO: PlayerPicturesGetDTO = {
+        userName: data?.User.user_name as string,
         voteId: data?.id as number,
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
