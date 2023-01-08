@@ -27,7 +27,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
         data: {
             user_id: userId,
             title: voteDTO.title,
-            status: false,
+            status: true,
             count: 0,
             date: +dayjs().format("YYYYMM"),
         },
