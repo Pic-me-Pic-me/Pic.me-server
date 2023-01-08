@@ -5,6 +5,10 @@ import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { Picture, PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
+import { rm } from "fs";
+import { title } from "process";
+import { stringMap } from "aws-sdk/clients/backup";
+import dayjs from "dayjs";
 
 const prisma = new PrismaClient();
 
@@ -28,13 +32,13 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             title: voteDTO.title,
             status: voteDTO.status,
             count: voteDTO.count,
-            date: 20220301,
+            date: +dayjs().format("YYYYMM"),
         },
     });
     if (!data) return null;
 
     if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
-    if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
+    if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
     return data;
 };
 
