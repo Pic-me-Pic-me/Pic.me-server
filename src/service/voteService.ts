@@ -35,7 +35,11 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     if (!data) return null;
 
     if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
+    console.log("createVote");
+    console.log(voteDTO.pictures[0]);
     if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
+    console.log("createVote");
+    console.log(voteDTO.pictures[1]);
     return data;
 };
 
@@ -67,6 +71,7 @@ const closeVote = async (voteId: number, userId: number) => {
 };
 
 const createPictures = async (voteId: number, pictureUrl: string) => {
+    console.log("createPictures");
     const data = await prisma.picture.create({
         data: {
             url: pictureUrl,
@@ -74,6 +79,7 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
             vote_id: voteId,
         },
     });
+    console.log(data.url);
     if (!data) return null;
     return data.id;
 };
@@ -222,7 +228,7 @@ const getVoteLibrary = async (userId: number) => {
             date: "desc",
         },
     });
-
+    console.log(dates);
     if (dates.length == 0) return dates;
 
     const result: object[] = await Promise.all(

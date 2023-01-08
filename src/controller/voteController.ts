@@ -11,6 +11,8 @@ const createVote = async (req: Request, res: Response) => {
     const locations = images.map((image: Express.MulterS3.File) => {
         return image.location;
     });
+    console.log("controller");
+    console.log(locations);
     const voteDTO: VoteCreateDTO = {
         title: req.body.title,
         status: false,
