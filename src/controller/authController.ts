@@ -75,7 +75,7 @@ const signInUser = async (req: Request, res: Response) => {
 const createSocialUser = async (req: Request, res: Response) => {
     const { uid, socialType, userName, email } = req.body;
 
-    let existUser = await authService.findByKey(String(uid), socialType);
+    let existUser = await authService.findByKey(uid, socialType);
 
     if (existUser) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
 
@@ -103,7 +103,7 @@ const findSocialUser = async (req: Request, res: Response) => {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
     if (user == rm.NO_SOCIAL_USER)
         return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
-    const existUser = await authService.findByKey(String((user as SocialUser).userId), socialType);
+    const existUser = await authService.findByKey((user as SocialUser).userId, socialType);
     let data = {
         uid: (user as SocialUser).userId,
         email: (user as SocialUser).email,
@@ -121,7 +121,7 @@ const loginSocialUser = async (req: Request, res: Response) => {
 
     if (!uid || !socialType)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
-    const existUser = await authService.findByKey(String(uid), socialType);
+    const existUser = await authService.findByKey(uid, socialType);
 
     if (!existUser)
         return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.CHECK_KAKAO_USER_FAIL));
