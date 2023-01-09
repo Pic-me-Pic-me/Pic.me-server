@@ -12,6 +12,10 @@ const createVote = async (req: Request, res: Response) => {
         return image.location;
     });
 
+    if (locations.length != 2) {
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TWO_PICTURES));
+    }
+
     const voteDTO: VoteCreateDTO = {
         title: req.body.title,
         status: true,
