@@ -5,7 +5,7 @@ import { fail, success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
 
 const createVote = async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
     const locations = images.map((image: Express.MulterS3.File) => {
@@ -24,7 +24,7 @@ const createVote = async (req: Request, res: Response) => {
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
     if (data == sc.BAD_REQUEST)
         return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
-    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS));
+    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS, data));
 };
 
 const deleteVote = async (req: Request, res: Response) => {
@@ -54,8 +54,8 @@ const getSingleVote = async (req: Request, res: Response) => {
 
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { cursorId } = req.params;
-    const { userId } = req.body;
-    const data = await voteService.getCurrentVotes(+userId, +cursorId);
+
+    const data = await voteService.getCurrentVotes(+req.body.userId, +cursorId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
 
@@ -63,7 +63,11 @@ const getCurrentVotes = async (req: Request, res: Response) => {
 };
 
 const getVoteLibrary = async (req: Request, res: Response) => {
-    const data = await voteService.getVoteLibrary(req.body.userId);
+    const { flag } = req.query;
+
+    if (!flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+
+    const data = await voteService.getVoteLibrary(req.body.userId, +flag);
 
     if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, data));
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
