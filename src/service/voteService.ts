@@ -36,8 +36,6 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     if (!data) return null;
 
     if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
-    console.log("createVote");
-    console.log(voteDTO.pictures[0]);
     if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
     return data.id;
 };
