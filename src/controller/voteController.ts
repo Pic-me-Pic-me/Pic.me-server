@@ -12,6 +12,10 @@ const createVote = async (req: Request, res: Response) => {
         return image.location;
     });
 
+    if (locations.length != 2) {
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TWO_PICTURES));
+    }
+
     const voteDTO: VoteCreateDTO = {
         title: req.body.title,
         status: true,
@@ -21,8 +25,7 @@ const createVote = async (req: Request, res: Response) => {
 
     const data = await voteService.createVote(+userId, voteDTO);
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
-    if (data == sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.OK, rm.CREATE_PICTURE_FAIL));
+
     return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS, data));
 };
 

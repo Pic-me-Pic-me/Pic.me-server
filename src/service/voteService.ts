@@ -31,12 +31,17 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             count: 0,
             created_at: dayjs().add(9, "hour").format(),
             date: +dayjs().format("YYYYMM"),
+            Picture: {
+                create: [
+                    { url: voteDTO.pictures[0], count: 0 },
+                    { url: voteDTO.pictures[1], count: 0 },
+                ],
+            },
         },
     });
+
     if (!data) return null;
 
-    if ((await createPictures(+data.id, voteDTO.pictures[0])) == null) return sc.BAD_REQUEST;
-    if ((await createPictures(+data.id, voteDTO.pictures[1])) == null) return sc.BAD_REQUEST;
     return data.id;
 };
 
@@ -64,20 +69,6 @@ const closeVote = async (voteId: number, userId: number) => {
 
     if (!data) return null;
 
-    return data.id;
-};
-
-const createPictures = async (voteId: number, pictureUrl: string) => {
-    console.log("createPictures");
-    const data = await prisma.picture.create({
-        data: {
-            url: pictureUrl,
-            count: 0,
-            vote_id: voteId,
-        },
-    });
-    console.log(data.url);
-    if (!data) return null;
     return data.id;
 };
 
