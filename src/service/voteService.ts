@@ -150,8 +150,6 @@ const getSingleVote = async (voteId: number) => {
 };
 
 const getCurrentVotes = async (userId: number, cursorId: number) => {
-    console.log(userId, cursorId);
-
     const isFirstPage = !cursorId;
 
     const pageCondition = {
@@ -216,13 +214,14 @@ const getVoteLibrary = async (userId: number, flag: number) => {
             date: "desc",
         },
     });
-    console.log(dates);
+
     if (dates.length == 0) return dates;
 
     if (flag == 0) {
         dates = dates.splice(0, 3);
     } else {
         const index = dates.findIndex((data) => data.date === flag);
+        if (index == -1) return [];
         dates = dates.splice(index + 1, 3);
     }
 

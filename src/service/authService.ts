@@ -72,7 +72,6 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
 
         return user.id;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };
