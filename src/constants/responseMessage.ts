@@ -47,6 +47,7 @@ export default {
     // vote
     CREATE_VOTE_SUCCESS: "투표 생성 성공",
     CREATE_VOTE_FAIL: "투표 생성 실패",
+    NOT_TWO_PICTURES: "두장의 파일을 업로드 해주세요, 사진 업로드 개수 오류 ",
     CREATE_PICTURE_FAIL: "투표 내 사진 저장 실패",
     NO_CURRENT_VOTE: "현재 진행중인 투표들 없음[null] ",
     GET_VOTE_FAIL: "사진과 스티커 갖고오기 실패",
