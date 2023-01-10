@@ -68,7 +68,6 @@ const closeVote = async (voteId: number, userId: number) => {
 };
 
 const createPictures = async (voteId: number, pictureUrl: string) => {
-    console.log("createPictures");
     const data = await prisma.picture.create({
         data: {
             url: pictureUrl,
@@ -76,7 +75,7 @@ const createPictures = async (voteId: number, pictureUrl: string) => {
             vote_id: voteId,
         },
     });
-    console.log(data.url);
+
     if (!data) return null;
     return data.id;
 };
@@ -159,8 +158,6 @@ const getSingleVote = async (voteId: number) => {
 };
 
 const getCurrentVotes = async (userId: number, cursorId: number) => {
-    console.log(userId, cursorId);
-
     const isFirstPage = !cursorId;
 
     const pageCondition = {
@@ -225,13 +222,14 @@ const getVoteLibrary = async (userId: number, flag: number) => {
             date: "desc",
         },
     });
-    console.log(dates);
+
     if (dates.length == 0) return dates;
 
     if (flag == 0) {
         dates = dates.splice(0, 3);
     } else {
         const index = dates.findIndex((data) => data.date === flag);
+        if (index == -1) return [];
         dates = dates.splice(index + 1, 3);
     }
 

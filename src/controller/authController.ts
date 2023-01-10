@@ -65,7 +65,6 @@ const signInUser = async (req: Request, res: Response) => {
 
         res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
     } catch (e) {
-        console.log(error);
         res.status(sc.INTERNAL_SERVER_ERROR).send(
             fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR)
         );

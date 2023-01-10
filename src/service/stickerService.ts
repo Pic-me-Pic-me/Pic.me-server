@@ -118,7 +118,6 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
 
         return data;
     } catch (e) {
-        console.log(e);
         return sc.BAD_REQUEST;
     }
 };

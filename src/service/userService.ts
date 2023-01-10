@@ -31,7 +31,7 @@ const checkUserName = async (userName: string) => {
             user_name: userName,
         },
     });
-    console.log(data);
+
     if (!data) return sc.OK;
 
     if (data) return sc.CONFLICT;
