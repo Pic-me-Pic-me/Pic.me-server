@@ -48,7 +48,7 @@ const signInUser = async (req: Request, res: Response) => {
 
         if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_EMAIL));
         else if (data === sc.UNAUTHORIZED)
-            return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_PASSWORD));
+            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_PASSWORD));
 
         const userName = await authService.getEmailById(data!);
 
