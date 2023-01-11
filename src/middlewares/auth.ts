@@ -12,16 +12,20 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     try {
         const decoded = jwtHandler.verify(token);
 
-        if (decoded === tokenType.TOKEN_EXPIRED) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
-        if (decoded === tokenType.TOKEN_INVALID) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+        if (decoded === tokenType.TOKEN_EXPIRED)
+            return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
+        if (decoded === tokenType.TOKEN_INVALID)
+            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
 
         const userId: number = (decoded as JwtPayload).userId;
-        if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+        if (!userId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
 
         req.body.userId = userId;
         next();
     } catch (error) {
         console.log(error);
-        res.status(sc.INTERNAL_SERVER_ERROR).send(fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR));
+        res.status(sc.INTERNAL_SERVER_ERROR).send(
+            fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR)
+        );
     }
 };

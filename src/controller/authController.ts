@@ -97,11 +97,11 @@ const findSocialUser = async (req: Request, res: Response) => {
 
     const user = await authService.getUser(socialType, token);
 
-    if (!user) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (!user) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
     if (user == rm.NO_SOCIAL_TYPE)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
     if (user == rm.NO_SOCIAL_USER)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.NO_SOCIAL_USER));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_USER));
     const existUser = await authService.findByKey((user as SocialUser).userId, socialType);
     let data = {
         uid: (user as SocialUser).userId,
@@ -123,7 +123,7 @@ const loginSocialUser = async (req: Request, res: Response) => {
     const existUser = await authService.findByKey(uid, socialType);
 
     if (!existUser)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.CHECK_KAKAO_USER_FAIL));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CHECK_KAKAO_USER_FAIL));
 
     const updatedUser = await authService.updateRefreshToken(existUser.id);
     const accessToken = jwtHandler.sign(updatedUser.id);
@@ -148,13 +148,13 @@ const tokenRefresh = async (req: Request, res: Response) => {
 
     // refreshToken, accessToken all expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED && decoded === tokenType.TOKEN_EXPIRED)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_ALL_TOKEN));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_ALL_TOKEN));
     // refreshToken expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EXPIRED_TOKEN));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_TOKEN));
     // refreshToken or accessToken invalid
     if (refreshDecoded === tokenType.TOKEN_INVALID || decoded === tokenType.TOKEN_INVALID)
-        return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
 
     // accessToken still valid
     const accessTokenChk: number = (decoded as JwtPayload).userId;
@@ -162,7 +162,7 @@ const tokenRefresh = async (req: Request, res: Response) => {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VALID_TOKEN));
 
     const userId: number = (refreshDecoded as JwtPayload).userId;
-    if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (!userId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
 
     const newAccessToken = await authService.tokenRefresh(userId, refreshToken);
 
