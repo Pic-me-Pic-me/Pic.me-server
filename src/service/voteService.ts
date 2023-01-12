@@ -3,24 +3,12 @@ import { SingleVoteGetDTO } from "./../interfaces/SingleVoteGetDTO";
 import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO";
 import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
+import { GetAllLibraryResultDTO } from "../interfaces/GetAllLibraryResultDTO";
 import { PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
 import dayjs from "dayjs";
 
 const prisma = new PrismaClient();
-
-const refineVoteDate = async (voteData: object[]) => {
-    voteData.map((value: any) => {
-        if (value.Picture.length != 0) value["url"] = value.Picture[0].url;
-        else value["url"] = "";
-
-        value["createdAt"] = value.created_at;
-        delete value.created_at;
-        delete value.Picture;
-    });
-
-    return voteData;
-};
 
 const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     const data = await prisma.vote.create({
@@ -253,12 +241,21 @@ const getVoteLibrary = async (userId: number, flag: number) => {
                 take: 5,
             });
 
-            await refineVoteDate(voteData);
-
-            return {
-                date: value.date,
-                votes: voteData,
+            const resultDTO: GetAllLibraryResultDTO = {
+                date: value.date as number,
+                votes: voteData.map((value: any) => {
+                    let votesDTO = {
+                        id: value.id,
+                        title: value.title,
+                        count: value.count,
+                        url: value.Picture[0].url,
+                        createdAt: value.created_at,
+                    };
+                    return votesDTO;
+                }),
             };
+
+            return resultDTO;
         })
     );
 
@@ -294,9 +291,18 @@ const getVoteReaminder = async (userId: number, date: number, flag: number) => {
         cursor: { id: flag },
     });
 
-    await refineVoteDate(voteData);
+    const result = voteData.map((value: any) => {
+        let votesDTO = {
+            id: value.id,
+            title: value.title,
+            count: value.count,
+            url: value.Picture[0].url,
+            createdAt: value.created_at,
+        };
+        return votesDTO;
+    });
 
-    return voteData;
+    return result;
 };
 
 /*
