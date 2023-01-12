@@ -55,9 +55,7 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
         },
     });
 
-    await updateRefreshToken(data.id);
-
-    const user = await findById(data.id);
+    const user = await updateRefreshToken(data.id);
 
     return user;
 };
@@ -131,6 +129,7 @@ const updateRefreshToken = async (userId: number) => {
             refresh_token: refreshToken,
         },
     });
+
     return data;
 };
 
