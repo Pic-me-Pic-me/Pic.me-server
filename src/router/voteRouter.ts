@@ -10,7 +10,9 @@ router.get("/getCurrentVote/:cursorId", auth, voteController.getCurrentVotes); /
 
 router.delete("/:voteId", auth, voteController.deleteVote);
 
-router.get("/maker/singleResult/:voteId", auth, voteController.getSingleVote); //라우터 경로 추천좀
+router.get("/maker/singleResult/:voteId", auth, voteController.getSingleVote); // 완료된 투표 결과 확인
+
+router.get("/maker/currentSingleResult/:voteId", auth, voteController.getCurrentSingleVote); //현재 진행중인 투표의 결과 확인,
 
 router.patch("/close/:voteId", auth, voteController.closeVote);
 

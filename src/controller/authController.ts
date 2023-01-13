@@ -79,6 +79,9 @@ const createSocialUser = async (req: Request, res: Response) => {
     if (existUser) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
 
     const data = await authService.createSocialUser(email, userName, uid);
+
+    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_NICKNAME));
+
     const accessToken = jwtHandler.sign(data.id);
     const result = {
         id: data.id,

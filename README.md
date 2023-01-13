@@ -24,6 +24,8 @@
 
 <div ><strong> 진행했던 투표 목록을 모아보는 </strong> 라이브러리 기능을 통해 투표 현황 및 결과를 조회합니다. <br/>
 
+<br />
+
 <h2> 📥 Player </h2>
 <h4> 1️⃣ 투표 참여</h4>
 
@@ -39,7 +41,10 @@
 <div >선택한 사진 위에  <strong> 나의 시선이 머무른 곳에 스티커를 부착 </strong> 하여 직관적으로 결과를 나타냅니다. <br/>
   <div> 스티커 부착 뒤에는 현재까지 붙여진 스티커를 모두 나타내 현재 투표 상황을 보여줍니다. </div>
   
-#  👩‍💻 Pic.Server
+<br />
+<br />
+
+# 👩‍💻 Pic.Server
 
 <table align="center">
     <tr align="center">
@@ -81,21 +86,42 @@
     </tr>
 </table>
 
+<br />
+<br />
+
 # ⚒️ ERD
 
-![KakaoTalk_20230104_153216811](https://user-images.githubusercontent.com/54241139/210499157-923d86f2-7088-4020-9bff-9dae66352436.png)
+![erd](https://user-images.githubusercontent.com/77230391/212268472-aaeacbfc-01ab-40e7-a859-83f5cc770f3a.png)
 
-# 역할 분담 및 API 로직 구현 진척도
+<br />
+
+## ✅ Server Architecture
+
+<br />
+
+<img width="80%" src="https://user-images.githubusercontent.com/77230391/212266294-c3c84421-ba85-4edd-9a02-58e5ba826a8a.png"/>
+
+<br />
+<br />
+<br />
+
+# 👨‍👩‍👧 역할 분담 및 API 로직 구현 진척도
 
 https://charm-wolfsbane-f42.notion.site/API-ff429d56790c4ecb8c0d877852bf95a2
 
-# ✅ 커밋 컨벤션
+<br />
+<br />
+<br />
+
+# 🌱 커밋 컨벤션
 
 ### 1 Issue = 1 Branch = 1 PR
 
+<br />
+
 ## Commit
 
-``[분류]` : `작업 내역` - `#이슈 번호`
+### [분류] : 작업 내역 - #이슈 번호
 
 ```bash
 chore: 세팅, 변수 설정 등 #2
@@ -109,18 +135,22 @@ rename: 파일, 클래스, 변수명 등 이름 변경 #2
 docs: Wiki, README 파일 수정 #2
 ```
 
-## Branch Naming
+<br />
 
-`분류` /`#이슈 번호` - `상세 작업 내역`
+## 🪵 Branch Naming
 
-```jsx
+### 분류 /#이슈 번호 - 상세 작업 내역
+
+```
 chore/#3-project-setting
 feat/#4-kakao-auth
 fix/#2-login-type-error
 refactor/#1-code-indent
 ```
 
-## 작업 순서
+<br />
+
+## 👣 작업 순서
 
 ```
 1. 이슈 생성
@@ -133,13 +163,19 @@ refactor/#1-code-indent
 8. Delete Branch
 ```
 
+<br />
+
 # ✅ 코딩 컨벤션
 
 https://darkened-purpose-5e9.notion.site/Coding-Convention-4934afbbf5ad4a7a9ad3570cca736a9f
 
+<br />
+
 # ✅ branch 전략
 
 https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
+
+<br />
 
 # 📁 폴더 구조
 
@@ -156,10 +192,13 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
     │   ├── controller
     │   ├── interfaces
     │   ├── middlewares
-    │   ├── modlues
+    │   ├── modules
     │   ├── router
     │   ├── service
-    │   └── indext.ts
+    │   └── index.ts
+    ├── test/
+    │   ├── auth
+    │   ├── vote
     ├── .eslintrc
     ├── .gitignore
     ├── .prettierrc.json
@@ -168,3 +207,74 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
     ├── README.md
     └── tsconfig.json
 ```
+
+<br/>
+
+# 🗃️ package.json
+
+```
+{
+    "name": "Pic.me-server",
+    "version": "1.0.0",
+    "description": "pic.me API",
+    "main": "index.js",
+    "repository": "https://github.com/Pic-me-Pic-me/Pic.me-server",
+    "author": "<dragontaek98@naver.com>",
+    "license": "MIT",
+    "scripts": {
+        "dev": "nodemon",
+        "build": "tsc && node dist",
+        "db:pull": "npx prisma db pull",
+        "db:push": "npx prisma db push",
+        "generate": "npx prisma generate",
+        "prepare": "husky install",
+        "greeting": "hello husky!",
+        "test": "yarn mocha test/**/*.ts -r ts-node/register --exit"
+    },
+    "dependencies": {
+        "@prisma/client": "^4.8.0",
+        "@types/cors": "^2.8.13",
+        "aws-sdk": "^2.1286.0",
+        "axios": "^1.2.2",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dayjs": "^1.11.7",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-validator": "^6.14.2",
+        "jsonwebtoken": "^9.0.0",
+        "multer": "^1.4.5-lts.1",
+        "multer-s3": "^3.0.1",
+        "prisma": "^4.8.0",
+        "typescript": "^4.9.4"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.2",
+        "@types/chai": "^4.3.4",
+        "@types/express": "^4.17.15",
+        "@types/express-validator": "^3.0.0",
+        "@types/jsonwebtoken": "^9.0.0",
+        "@types/mocha": "^10.0.1",
+        "@types/multer": "^1.4.7",
+        "@types/multer-s3": "^3.0.0",
+        "@types/node": "^18.11.18",
+        "@types/supertest": "^2.0.12",
+        "chai": "^4.3.7",
+        "eslint": "^8.31.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-airbnb-typescript": "^17.0.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "husky": "^8.0.0",
+        "mocha": "^10.2.0",
+        "nodemon": "^2.0.20",
+        "prettier": "^2.8.1",
+        "supertest": "^6.3.3",
+        "ts-node": "^10.9.1"
+    }
+}
+
+```
+
+<br />
