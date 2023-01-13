@@ -20,15 +20,14 @@ const createSticker = async (
     tx: Prisma.TransactionClient,
     parsedLocation: string,
     pictureId: number,
-    emoji: number,
-    count: number
+    emoji: number
 ) => {
     const createdSticker = await tx.sticker.create({
         data: {
             sticker_location: parsedLocation,
             emoji: emoji,
             picture_id: pictureId,
-            count: count,
+            count: 1,
         },
     });
 
@@ -38,14 +37,13 @@ const createSticker = async (
 const updateSticker = async (
     tx: Prisma.TransactionClient,
     currentLocation: string,
-    length: number,
     stickerId: number
 ) => {
     const updatedSticker = await tx.sticker.update({
         data: {
             sticker_location: currentLocation,
             count: {
-                increment: length,
+                increment: 1,
             },
         },
         where: {
@@ -64,8 +62,6 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
 
     if (!picture) return null;
 
-    const length = stickerCreateDto.location.length;
-
     try {
         const data = await prisma.$transaction(async (tx) => {
             const sticker = await findSticker(
@@ -82,8 +78,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
                     tx,
                     parsedLocation,
                     stickerCreateDto.pictureId,
-                    stickerCreateDto.emoji,
-                    length
+                    stickerCreateDto.emoji
                 );
             } else {
                 let parseCurrentLocation = JSON.parse(sticker.sticker_location as string);
@@ -92,7 +87,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
                 });
                 parseCurrentLocation = JSON.stringify(parseCurrentLocation);
 
-                modifiedSticker = await updateSticker(tx, parseCurrentLocation, length, sticker.id);
+                modifiedSticker = await updateSticker(tx, parseCurrentLocation, sticker.id);
             }
 
             const picture = await tx.picture.update({

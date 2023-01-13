@@ -120,19 +120,44 @@ const getSingleVote = async (voteId: number) => {
         currentVote: data?.count as number,
         createdDate: data?.created_at as Date,
         Picture: data?.Picture.map((value: any) => {
+            let skeleton = [
+                {
+                    stickerLocation: "",
+                    emoji: 0,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 1,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 2,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 3,
+                    count: 0,
+                },
+            ];
+
+            value.Sticker.map((sticker: any) => {
+                const index = skeleton.findIndex((e) => e.emoji === sticker.emoji);
+                if (index != -1) {
+                    skeleton[index].stickerLocation = sticker.sticker_location;
+                    skeleton[index].count = sticker.count;
+                }
+            });
+
             let DTOs = {
                 pictureId: value.id,
                 url: value.url,
                 count: value.count,
-                Sticker: value.Sticker.map((sticker: any) => {
-                    let stickerDTO = {
-                        stickerLocation: sticker.sticker_location,
-                        emoji: sticker.emoji,
-                        count: sticker.count,
-                    };
-                    return stickerDTO;
-                }),
+                Sticker: skeleton,
             };
+
             return DTOs;
         }) as object[],
     };
@@ -180,19 +205,44 @@ const getCurrentSingleVote = async (voteId: number) => {
         currentVote: data?.count as number,
         createdDate: data?.created_at as Date,
         Picture: data?.Picture.map((value: any) => {
+            let skeleton = [
+                {
+                    stickerLocation: "",
+                    emoji: 0,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 1,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 2,
+                    count: 0,
+                },
+                {
+                    stickerLocation: "",
+                    emoji: 3,
+                    count: 0,
+                },
+            ];
+
+            value.Sticker.map((sticker: any) => {
+                const index = skeleton.findIndex((e) => e.emoji === sticker.emoji);
+                if (index != -1) {
+                    skeleton[index].stickerLocation = sticker.sticker_location;
+                    skeleton[index].count = sticker.count;
+                }
+            });
+
             let DTOs = {
                 pictureId: value.id,
                 url: value.url,
                 count: value.count,
-                Sticker: value.Sticker.map((sticker: any) => {
-                    let stickerDTO = {
-                        stickerLocation: sticker.sticker_location,
-                        emoji: sticker.emoji,
-                        count: sticker.count,
-                    };
-                    return stickerDTO;
-                }),
+                Sticker: skeleton,
             };
+
             return DTOs;
         }) as object[],
     };
