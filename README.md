@@ -168,3 +168,78 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
     ├── README.md
     └── tsconfig.json
 ```
+
+<br/>
+
+# package.json
+
+```
+{
+    "name": "Pic.me-server",
+    "version": "1.0.0",
+    "description": "pic.me API",
+    "main": "index.js",
+    "repository": "https://github.com/Pic-me-Pic-me/Pic.me-server",
+    "author": "<dragontaek98@naver.com>",
+    "license": "MIT",
+    "scripts": {
+        "dev": "nodemon",
+        "build": "tsc && node dist",
+        "db:pull": "npx prisma db pull",
+        "db:push": "npx prisma db push",
+        "generate": "npx prisma generate",
+        "prepare": "husky install",
+        "greeting": "hello husky!",
+        "test": "yarn mocha test/**/*.ts -r ts-node/register --exit"
+    },
+    "dependencies": {
+        "@prisma/client": "^4.8.0",
+        "@types/cors": "^2.8.13",
+        "aws-sdk": "^2.1286.0",
+        "axios": "^1.2.2",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dayjs": "^1.11.7",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-validator": "^6.14.2",
+        "jsonwebtoken": "^9.0.0",
+        "multer": "^1.4.5-lts.1",
+        "multer-s3": "^3.0.1",
+        "prisma": "^4.8.0",
+        "typescript": "^4.9.4"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.2",
+        "@types/chai": "^4.3.4",
+        "@types/express": "^4.17.15",
+        "@types/express-validator": "^3.0.0",
+        "@types/jsonwebtoken": "^9.0.0",
+        "@types/mocha": "^10.0.1",
+        "@types/multer": "^1.4.7",
+        "@types/multer-s3": "^3.0.0",
+        "@types/node": "^18.11.18",
+        "@types/supertest": "^2.0.12",
+        "chai": "^4.3.7",
+        "eslint": "^8.31.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-airbnb-typescript": "^17.0.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "husky": "^8.0.0",
+        "mocha": "^10.2.0",
+        "nodemon": "^2.0.20",
+        "prettier": "^2.8.1",
+        "supertest": "^6.3.3",
+        "ts-node": "^10.9.1"
+    }
+}
+
+```
+
+<br />
+
+## 서버 구조
+
+<img width="80%" src="https://user-images.githubusercontent.com/77230391/212266294-c3c84421-ba85-4edd-9a02-58e5ba826a8a.png"/>
