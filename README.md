@@ -105,7 +105,7 @@
 <br />
 <br />
 
-# 역할 분담 및 API 로직 구현 진척도
+# 👨‍👩‍👧 역할 분담 및 API 로직 구현 진척도
 
 https://charm-wolfsbane-f42.notion.site/API-ff429d56790c4ecb8c0d877852bf95a2
 
@@ -113,13 +113,15 @@ https://charm-wolfsbane-f42.notion.site/API-ff429d56790c4ecb8c0d877852bf95a2
 <br />
 <br />
 
-# ✅ 커밋 컨벤션
+# 🌱 커밋 컨벤션
 
 ### 1 Issue = 1 Branch = 1 PR
 
+<br />
+
 ## Commit
 
-``[분류]` : `작업 내역` - `#이슈 번호`
+### [분류] : 작업 내역 - #이슈 번호
 
 ```bash
 chore: 세팅, 변수 설정 등 #2
@@ -135,11 +137,11 @@ docs: Wiki, README 파일 수정 #2
 
 <br />
 
-## Branch Naming
+## 🪵 Branch Naming
 
-`분류` /`#이슈 번호` - `상세 작업 내역`
+### 분류 /#이슈 번호 - 상세 작업 내역
 
-```jsx
+```
 chore/#3-project-setting
 feat/#4-kakao-auth
 fix/#2-login-type-error
@@ -148,7 +150,7 @@ refactor/#1-code-indent
 
 <br />
 
-## 작업 순서
+## 👣 작업 순서
 
 ```
 1. 이슈 생성
@@ -208,7 +210,7 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
 
 <br/>
 
-# package.json
+# 🗃️ package.json
 
 ```
 {
