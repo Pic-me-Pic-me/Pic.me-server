@@ -99,6 +99,7 @@ const findByKey = async (kakaoId: number, socialType: string) => {
 };
 
 const createSocialUser = async (email: string, nickname: string, kakaoId: number) => {
+    if (await chkByUserName(nickname)) return null;
     const user = await prisma.user.create({
         data: {
             user_name: nickname,
