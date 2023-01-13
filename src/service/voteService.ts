@@ -314,9 +314,6 @@ const playerGetPictures = async (voteId: number) => {
                     id: true,
                     url: true,
                 },
-                orderBy: {
-                    id: "asc",
-                },
             },
             User: {
                 select: {
