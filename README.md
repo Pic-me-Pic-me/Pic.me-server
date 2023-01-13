@@ -24,6 +24,8 @@
 
 <div ><strong> 진행했던 투표 목록을 모아보는 </strong> 라이브러리 기능을 통해 투표 현황 및 결과를 조회합니다. <br/>
 
+<br />
+
 <h2> 📥 Player </h2>
 <h4> 1️⃣ 투표 참여</h4>
 
@@ -39,7 +41,10 @@
 <div >선택한 사진 위에  <strong> 나의 시선이 머무른 곳에 스티커를 부착 </strong> 하여 직관적으로 결과를 나타냅니다. <br/>
   <div> 스티커 부착 뒤에는 현재까지 붙여진 스티커를 모두 나타내 현재 투표 상황을 보여줍니다. </div>
   
-#  👩‍💻 Pic.Server
+<br />
+<br />
+
+# 👩‍💻 Pic.Server
 
 <table align="center">
     <tr align="center">
@@ -81,13 +86,32 @@
     </tr>
 </table>
 
+<br />
+<br />
+
 # ⚒️ ERD
 
 ![erd](https://user-images.githubusercontent.com/77230391/212268472-aaeacbfc-01ab-40e7-a859-83f5cc770f3a.png)
 
+<br />
+
+## ✅ Server Architecture
+
+<br />
+
+<img width="80%" src="https://user-images.githubusercontent.com/77230391/212266294-c3c84421-ba85-4edd-9a02-58e5ba826a8a.png"/>
+
+<br />
+<br />
+<br />
+
 # 역할 분담 및 API 로직 구현 진척도
 
 https://charm-wolfsbane-f42.notion.site/API-ff429d56790c4ecb8c0d877852bf95a2
+
+<br />
+<br />
+<br />
 
 # ✅ 커밋 컨벤션
 
@@ -109,6 +133,8 @@ rename: 파일, 클래스, 변수명 등 이름 변경 #2
 docs: Wiki, README 파일 수정 #2
 ```
 
+<br />
+
 ## Branch Naming
 
 `분류` /`#이슈 번호` - `상세 작업 내역`
@@ -119,6 +145,8 @@ feat/#4-kakao-auth
 fix/#2-login-type-error
 refactor/#1-code-indent
 ```
+
+<br />
 
 ## 작업 순서
 
@@ -133,13 +161,19 @@ refactor/#1-code-indent
 8. Delete Branch
 ```
 
+<br />
+
 # ✅ 코딩 컨벤션
 
 https://darkened-purpose-5e9.notion.site/Coding-Convention-4934afbbf5ad4a7a9ad3570cca736a9f
 
+<br />
+
 # ✅ branch 전략
 
 https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
+
+<br />
 
 # 📁 폴더 구조
 
@@ -242,7 +276,3 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
 ```
 
 <br />
-
-## Server Architecture
-
-<img width="80%" src="https://user-images.githubusercontent.com/77230391/212266294-c3c84421-ba85-4edd-9a02-58e5ba826a8a.png"/>
