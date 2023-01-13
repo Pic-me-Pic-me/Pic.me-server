@@ -234,7 +234,7 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
                     url: true,
                 },
                 orderBy: {
-                    count: "desc",
+                    id: "asc",
                 },
             },
         },
