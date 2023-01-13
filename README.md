@@ -83,7 +83,7 @@
 
 # ⚒️ ERD
 
-![KakaoTalk_20230104_153216811](https://user-images.githubusercontent.com/54241139/210499157-923d86f2-7088-4020-9bff-9dae66352436.png)
+![erd](https://user-images.githubusercontent.com/77230391/212268472-aaeacbfc-01ab-40e7-a859-83f5cc770f3a.png)
 
 # 역할 분담 및 API 로직 구현 진척도
 
@@ -156,10 +156,13 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
     │   ├── controller
     │   ├── interfaces
     │   ├── middlewares
-    │   ├── modlues
+    │   ├── modules
     │   ├── router
     │   ├── service
-    │   └── indext.ts
+    │   └── index.ts
+    ├── test/
+    │   ├── auth
+    │   ├── vote
     ├── .eslintrc
     ├── .gitignore
     ├── .prettierrc.json
@@ -240,6 +243,6 @@ https://darkened-purpose-5e9.notion.site/Branch-326ab8efcd3242f2838dd93a079958c5
 
 <br />
 
-## 서버 구조
+## Server Architecture
 
 <img width="80%" src="https://user-images.githubusercontent.com/77230391/212266294-c3c84421-ba85-4edd-9a02-58e5ba826a8a.png"/>
