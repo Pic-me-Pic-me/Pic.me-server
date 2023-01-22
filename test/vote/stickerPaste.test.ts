@@ -13,13 +13,13 @@ const testLocation = [
 ];
 
 describe("[POST] /sticker", () => {
-    it("20번 스티커 Paste", (done) => {
+    it("391번 스티커 Paste", (done) => {
         request(app)
             .post("/sticker")
             .set("Accept", "application/json")
             .type("application/json")
             .send({
-                pictureId: 20,
+                pictureId: 1994,
                 emoji: 1,
                 location: testLocation,
             })
@@ -27,7 +27,7 @@ describe("[POST] /sticker", () => {
                 expect(res.status).to.equal(200);
                 expect(res.body.message).to.equal("스티커 생성 성공");
 
-                expect(res.body.data).to.equal(7);
+                expect(res.body.data).to.equal(391);
 
                 assert.ok(res);
                 done();
