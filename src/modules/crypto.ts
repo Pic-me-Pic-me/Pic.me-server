@@ -2,7 +2,11 @@ import CryptoJS from "crypto-js";
 const privateKey = process.env.CRYPTO_PRIVATE_KEY;
 
 const encodeVoteId = (voteId: number) => {
-    const encodedId = CryptoJS.AES.encrypt(voteId.toString(), privateKey as string).toString();
+    let encodedId = "";
+    do {
+        encodedId = CryptoJS.AES.encrypt(voteId.toString(), privateKey as string).toString();
+    } while (encodedId.search("/") != -1);
+
     return encodedId;
 };
 
