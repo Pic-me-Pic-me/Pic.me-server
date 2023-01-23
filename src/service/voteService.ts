@@ -5,6 +5,7 @@ import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { GetAllLibraryResultDTO } from "../interfaces/GetAllLibraryResultDTO";
 import { PrismaClient } from "@prisma/client";
+import crypto from "../modules/crypto";
 import { sc } from "../constants";
 import dayjs from "dayjs";
 
@@ -30,7 +31,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
 
     if (!data) return null;
 
-    return data.id;
+    return crypto.encodeVoteId(data.id);
 };
 
 const closeVote = async (voteId: number, userId: number) => {
