@@ -5,6 +5,11 @@ import { fail, success } from "../constants/response";
 import { stickerService } from "../service";
 import { StickerCreateDTO } from "../interfaces/StickerCreateDTO";
 
+/**
+ * paste sticker for specific picture of a vote
+ *
+ * @api {post} /sticker
+ */
 const stickerPaste = async (req: Request, res: Response) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {

@@ -165,7 +165,7 @@ const loginSocialUser = async (req: Request, res: Response) => {
 };
 
 /**
- * refresh the accessToken
+ * refresh accessToken
  *
  * @api {post} /auth/token
  */
