@@ -13,7 +13,6 @@ const deleteImages = async (urls: ObjectIdentifier[]) => {
             })
         );
 
-        console.log("[success] object deleted!");
         return data;
     } catch (err) {
         console.log("[Error]", err);

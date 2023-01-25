@@ -66,6 +66,7 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
         if (!user) return null;
 
         const isMatch = await bcrypt.compare(userSignInDto.password, user.password!);
+
         if (!isMatch) return sc.UNAUTHORIZED;
 
         return user.id;

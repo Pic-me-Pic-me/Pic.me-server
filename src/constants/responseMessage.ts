@@ -82,5 +82,5 @@ export default {
     INTERNAL_SERVER_ERROR: "서버 내 오류",
 
     // transaction fail
-    TRANSACTION_FAILED: "트랜잭션 오류",
+    TRANSACTION_FAILED: "트랜잭션 실패",
 };
