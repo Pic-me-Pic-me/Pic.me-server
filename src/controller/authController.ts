@@ -1,15 +1,21 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { authService } from "../service";
-import { rm, sc, socialType } from "../constants";
+import { rm, sc } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
+import { tokenRefreshDTO } from "../interfaces/tokenRefreshDTO";
 import { SocialUser } from "../interfaces/SocialUserDTO";
 import { fail, success } from "../constants/response";
 import { JwtPayload } from "jsonwebtoken";
 import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
 
+/**
+ * sign up with pic.me authentication
+ *
+ * @api {post} /auth
+ */
 const createUser = async (req: Request, res: Response) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
@@ -35,6 +41,11 @@ const createUser = async (req: Request, res: Response) => {
     return res.status(sc.CREATED).send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
 };
 
+/**
+ * sign in with pic.me authentication
+ *
+ * @api {post} /auth/signin
+ */
 const signInUser = async (req: Request, res: Response) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
@@ -50,15 +61,13 @@ const signInUser = async (req: Request, res: Response) => {
         else if (data === sc.UNAUTHORIZED)
             return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_PASSWORD));
 
-        const userName = await authService.getEmailById(data!);
-
         const user = await authService.updateRefreshToken(data);
 
         const accessToken = jwtHandler.sign(data);
 
         const result = {
             id: data,
-            userName: userName,
+            userName: user.user_name,
             refreshToken: user.refresh_token,
             accessToken,
         };
@@ -71,6 +80,11 @@ const signInUser = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * sign up with kakao
+ *
+ * @api {post} /auth/kakao
+ */
 const createSocialUser = async (req: Request, res: Response) => {
     const { uid, socialType, userName, email } = req.body;
 
@@ -92,6 +106,11 @@ const createSocialUser = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
 };
 
+/**
+ * check whether kakao user is a user of pic.me
+ *
+ * @api {post} /auth/kakao/check
+ */
 const findSocialUser = async (req: Request, res: Response) => {
     const { socialType, token } = req.body;
 
@@ -118,6 +137,11 @@ const findSocialUser = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
 };
 
+/**
+ * check whether kakao user is a user of pic.me
+ *
+ * @api {post} /auth/kakao/signin
+ */
 const loginSocialUser = async (req: Request, res: Response) => {
     const { uid, socialType } = req.body;
 
@@ -140,34 +164,46 @@ const loginSocialUser = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
 };
 
+/**
+ * refresh the accessToken
+ *
+ * @api {post} /auth/token
+ */
 const tokenRefresh = async (req: Request, res: Response) => {
-    const { refreshToken, accessToken } = req.body;
+    const error = validationResult(req);
 
-    if (!refreshToken || !accessToken)
+    if (!error.isEmpty()) {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EMPTY_TOKEN));
+    }
 
-    const refreshDecoded = jwtHandler.verify(refreshToken);
-    const decoded = jwtHandler.verify(accessToken);
+    const tokenRefreshDto: tokenRefreshDTO = req.body;
+
+    //verify tokens
+    const refreshDecoded = jwtHandler.verify(tokenRefreshDto.refreshToken);
+    const decoded = jwtHandler.verify(tokenRefreshDto.accessToken);
 
     // refreshToken, accessToken all expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED && decoded === tokenType.TOKEN_EXPIRED)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_ALL_TOKEN));
+
     // refreshToken expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_TOKEN));
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_REFRESH_TOKEN));
+
     // refreshToken or accessToken invalid
     if (refreshDecoded === tokenType.TOKEN_INVALID || decoded === tokenType.TOKEN_INVALID)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
 
     // accessToken still valid
-    const accessTokenChk: number = (decoded as JwtPayload).userId;
-    if (accessTokenChk)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VALID_TOKEN));
+    const accessDecodedUID: number = (decoded as JwtPayload).userId;
+    if (accessDecodedUID)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VALID_ACCESS_TOKEN));
 
-    const userId: number = (refreshDecoded as JwtPayload).userId;
-    if (!userId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
+    const refreshDecodedUID: number = (refreshDecoded as JwtPayload).userId;
+    if (!refreshDecodedUID)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_REFRESH_TOKEN));
 
-    const newAccessToken = await authService.tokenRefresh(userId, refreshToken);
+    const newAccessToken = await authService.tokenRefresh(refreshDecodedUID, tokenRefreshDto);
 
     if (!newAccessToken)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TOKEN_OWNER));

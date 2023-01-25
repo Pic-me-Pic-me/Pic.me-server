@@ -5,8 +5,12 @@ import { fail } from "../constants/response";
 import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
 
+const skipAuthPath = ["/sticker", "/auth", "/user/name", "/vote/player"];
+
 export default async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(" ").reverse()[0];
+    if (skipAuthPath.findIndex((x) => req.path.startsWith(x)) !== -1) return next();
+
     if (!token) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.EMPTY_TOKEN));
 
     try {
