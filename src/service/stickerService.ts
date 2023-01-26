@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { sc } from "../constants";
+import { rm, sc } from "../constants";
 import { StickerCreateDTO } from "../interfaces/StickerCreateDTO";
+import { PicmeException } from "../models/PicmeException";
 
 const prisma = new PrismaClient();
 
@@ -87,7 +88,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
         },
     });
 
-    if (!picture) return null;
+    if (!picture) throw new PicmeException(sc.BAD_REQUEST, false, rm.PICTURE_NOT_EXIST);
 
     try {
         const data = await prisma.$transaction(async (tx) => {
@@ -142,7 +143,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
 
         return data;
     } catch (e) {
-        return sc.BAD_REQUEST;
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.STICKER_TRANSCTION_FAIL);
     }
 };
 

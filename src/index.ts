@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import router from "./router";
 import cors from "cors";
 import auth from "./middlewares/auth";
+import errorHandler from "./middlewares/errorHandler";
 
 const app = express();
 const PORT = 3000;
@@ -22,5 +23,7 @@ app.listen(PORT, () => {
         #############################################
     `);
 });
+
+app.use(errorHandler);
 
 export default app;

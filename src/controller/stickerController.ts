@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { rm, sc } from "../constants";
 import { fail, success } from "../constants/response";
@@ -10,7 +10,7 @@ import { StickerCreateDTO } from "../interfaces/StickerCreateDTO";
  *
  * @api {post} /sticker
  */
-const stickerPaste = async (req: Request, res: Response) => {
+const stickerPaste = async (req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
@@ -20,13 +20,12 @@ const stickerPaste = async (req: Request, res: Response) => {
     if (StickerCreateDto.location.length > 3)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.STICKER_COUNT_EXCEED));
 
-    const data = await stickerService.stickerPaste(StickerCreateDto);
-
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PICTURE_NOT_EXIST));
-    if (data == sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.STICKER_TRANSCTION_FAIL));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_STICKER_SUCCESS, data));
+    try {
+        const data = await stickerService.stickerPaste(StickerCreateDto);
+        return res.status(sc.OK).send(success(sc.OK, rm.CREATE_STICKER_SUCCESS, data));
+    } catch (e) {
+        next(e);
+    }
 };
 
 const stickerController = {
