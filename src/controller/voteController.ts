@@ -3,6 +3,7 @@ import { authService, voteService } from "../service";
 import { rm, sc } from "../constants";
 import { fail, success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
+import crypto from "../modules/crypto";
 
 const createVote = async (req: Request, res: Response) => {
     const { userId } = req.body;
@@ -110,8 +111,8 @@ const getVoteReaminder = async (req: Request, res: Response) => {
 
 const playerGetPictures = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-
-    const data = await voteService.playerGetPictures(+voteId);
+    const decodedVoteId = crypto.decodeVoteId(voteId);
+    const data = await voteService.playerGetPictures(+decodedVoteId);
     if (!data)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
     if (data.voteStatus == false)
