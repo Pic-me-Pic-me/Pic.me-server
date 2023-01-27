@@ -4,9 +4,11 @@ import { PlayerGetVotedResultDTO } from "./../interfaces/PlayerGetVotedResultDTO
 import { CurrentVotesGetDTO } from "./../interfaces/CurrentVotesGetDTO";
 import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { GetAllLibraryResultDTO } from "../interfaces/GetAllLibraryResultDTO";
+import { ObjectIdentifier } from "../interfaces/ObjectIdentifier";
 import { PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
 import dayjs from "dayjs";
+import s3Remover from "../modules/s3Remover";
 
 const prisma = new PrismaClient();
 
@@ -60,12 +62,34 @@ const closeVote = async (voteId: number, userId: number) => {
     return data.id;
 };
 
-const deleteVote = async (userId: number, voteId: number) => {
-    await prisma.vote.delete({
-        where: {
-            id: voteId,
-        },
-    });
+const deleteVote = async (voteId: number) => {
+    try {
+        await prisma.$transaction(async (tx) => {
+            const pictures = await tx.picture.findMany({
+                where: {
+                    vote_id: voteId,
+                },
+            });
+
+            const urls: ObjectIdentifier[] = pictures.map((data) => {
+                return {
+                    Key: data.url.substring(data.url.lastIndexOf("/") + 1, data.url.length),
+                };
+            });
+
+            await s3Remover.deleteImages(urls);
+
+            await tx.vote.delete({
+                where: {
+                    id: voteId,
+                },
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        return sc.BAD_REQUEST;
+    }
+
     return sc.OK;
 };
 

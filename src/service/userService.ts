@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { sc } from "../constants";
 import { GetUserInfoDTO } from "../interfaces/GetUserInfoDTO";
+import { ObjectIdentifier } from "../interfaces/ObjectIdentifier";
+import s3Remover from "../modules/s3Remover";
 
 const prisma = new PrismaClient();
 
@@ -46,11 +48,65 @@ const deleteUser = async (userId: number) => {
 
     if (!check) return sc.NOT_FOUND;
 
-    await prisma.user.delete({
-        where: {
-            id: userId,
-        },
-    });
+    try {
+        await prisma.$transaction(async (tx) => {
+            const votes = await tx.vote.findMany({
+                select: {
+                    id: true,
+                },
+                where: {
+                    user_id: userId,
+                },
+            });
+
+            if (votes.length != 0) {
+                const urls: ObjectIdentifier[] = [];
+
+                await Promise.all(
+                    votes.map(async (data) => {
+                        const picture = await tx.picture.findMany({
+                            select: {
+                                url: true,
+                            },
+                            where: {
+                                vote_id: data.id,
+                            },
+                        });
+
+                        const firstImgUrl = picture[0].url;
+                        const secondImgUrl = picture[1].url;
+
+                        urls.push(
+                            {
+                                Key: firstImgUrl.substring(
+                                    firstImgUrl.lastIndexOf("/") + 1,
+                                    firstImgUrl.length
+                                ),
+                            },
+                            {
+                                Key: secondImgUrl.substring(
+                                    secondImgUrl.lastIndexOf("/") + 1,
+                                    secondImgUrl.length
+                                ),
+                            }
+                        );
+                    })
+                );
+
+                await s3Remover.deleteImages(urls);
+            }
+
+            await tx.user.delete({
+                where: {
+                    id: userId,
+                },
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        return sc.BAD_REQUEST;
+    }
+
     return sc.OK;
 };
 

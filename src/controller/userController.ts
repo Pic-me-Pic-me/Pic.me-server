@@ -24,8 +24,10 @@ const checkUserName = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
     const { userId } = req.body;
     const result = await userService.deleteUser(+userId);
+
     if (result == sc.NOT_FOUND)
         return res.status(sc.BAD_REQUEST).send(fail(sc.NO_CONTENT, rm.DELETE_USER_FAIL));
+
     return res.status(sc.OK).send(success(sc.OK, rm.DELETE_USER_SUCCESS));
 };
 
