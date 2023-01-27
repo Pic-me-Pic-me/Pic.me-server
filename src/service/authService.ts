@@ -1,14 +1,19 @@
-import { SocialUser } from "./../interfaces/SocialUserDTO";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
+import kakaoAuth from "../config/kakaoAuth";
+import { PrismaClient } from "@prisma/client";
+import jwtHandler from "../modules/jwtHandler";
 import { sc, rm, socialType } from "../constants";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
-import { auth } from "../middlewares";
-import jwtHandler from "../modules/jwtHandler";
-import kakaoAuth from "../config/kakaoAuth";
+import { tokenRefreshDTO } from "../interfaces/tokenRefreshDTO";
 
+const prisma = new PrismaClient();
+
+/**
+ * get user info by email
+ *
+ * @param {string} email user email
+ */
 const chkByEmail = async (email: string) => {
     const user = await prisma.user.findFirst({
         where: {
@@ -19,6 +24,11 @@ const chkByEmail = async (email: string) => {
     return user;
 };
 
+/**
+ * get user info by username
+ *
+ * @param {string} username user's username
+ */
 const chkByUserName = async (username: string) => {
     const user = await prisma.user.findFirst({
         where: {
@@ -29,6 +39,11 @@ const chkByUserName = async (username: string) => {
     return user;
 };
 
+/**
+ * get user info by user id
+ *
+ * @param {number} id user's unique id
+ */
 const findById = async (id: number) => {
     const user = await prisma.user.findUnique({
         where: {
@@ -39,6 +54,29 @@ const findById = async (id: number) => {
     return user;
 };
 
+/**
+ * find user by unique kakaoId, and social type
+ *
+ * @param {number} kakaoId unique kakao id provided by kakao
+ * @param {string} socialType social type
+ */
+const findByKey = async (kakaoId: number, socialType: string) => {
+    const auth = await prisma.authenticationProvider.findFirst({
+        where: {
+            id: kakaoId,
+            provider_type: socialType,
+        },
+    });
+    if (!auth) return null;
+    const user = await findById(auth.user_id);
+    return user;
+};
+
+/**
+ * create pic.me user account
+ *
+ * @param {UserCreateDTO} userCreateDto DTO for creating user
+ */
 const createUser = async (userCreateDto: UserCreateDTO) => {
     if (await chkByEmail(userCreateDto.email)) return null;
     if (await chkByUserName(userCreateDto?.username)) return null;
@@ -60,9 +98,15 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
     return user;
 };
 
+/**
+ * sign in pic.me user account
+ *
+ * @param {UserSignInDTO} userSignInDto DTO for signIn user
+ */
 const signIn = async (userSignInDto: UserSignInDTO) => {
     try {
         const user = await chkByEmail(userSignInDto.email);
+
         if (!user) return null;
 
         const isMatch = await bcrypt.compare(userSignInDto.password, user.password!);
@@ -75,11 +119,12 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
     }
 };
 
-const getEmailById = async (id: number) => {
-    const user = await findById(id);
-    return user?.user_name;
-};
-
+/**
+ * get user from kakao auth API
+ *
+ * @param {string} social social type: kakao
+ * @param {string} token kakao API access token
+ */
 const getUser = async (social: string, token: string) => {
     if (social != socialType.KAKAO) return rm.NO_SOCIAL_TYPE;
     const user = await kakaoAuth(token);
@@ -87,18 +132,13 @@ const getUser = async (social: string, token: string) => {
     return user;
 };
 
-const findByKey = async (kakaoId: number, socialType: string) => {
-    const auth = await prisma.authenticationProvider.findFirst({
-        where: {
-            id: kakaoId,
-            provider_type: socialType,
-        },
-    });
-    if (!auth) return null;
-    const user = await findById(auth.user_id);
-    return user;
-};
-
+/**
+ *  create picme account for authorized kakao user
+ *
+ * @param {string} email user kakao email
+ * @param {string} nickname user's username
+ * @param {number} kakaoId unique kakao id provided by kakao
+ */
 const createSocialUser = async (email: string, nickname: string, kakaoId: number) => {
     if (await chkByUserName(nickname)) return null;
     const user = await prisma.user.create({
@@ -121,6 +161,11 @@ const createSocialUser = async (email: string, nickname: string, kakaoId: number
     return data;
 };
 
+/**
+ * update refreshToken for signin, signup
+ *
+ * @param {number} userId unique kakao id provided by kakao
+ */
 const updateRefreshToken = async (userId: number) => {
     const refreshToken = jwtHandler.signRefresh(userId);
     const data = await prisma.user.update({
@@ -135,35 +180,30 @@ const updateRefreshToken = async (userId: number) => {
     return data;
 };
 
-const tokenRefresh = async (userId: number, refreshToken: String) => {
+/**
+ * update accessToken with refreshToken
+ *
+ * @param {number} userId user's unique id
+ * @param {tokenRefreshDTO} tokenRefreshDto DTO for token refresh
+ */
+const tokenRefresh = async (userId: number, tokenRefreshDto: tokenRefreshDTO) => {
     const user = await findById(userId);
 
-    if (user?.refresh_token != refreshToken) return null;
+    if (user?.refresh_token != tokenRefreshDto.refreshToken) return null;
 
     const accessToken = jwtHandler.sign(userId);
 
     return accessToken;
 };
 
-const findByRefreshToken = async (refreshToken: string) => {
-    const user = await prisma.user.findFirst({
-        where: {
-            refresh_token: refreshToken,
-        },
-    });
-    return user;
-};
-
 const authService = {
     createUser,
     signIn,
-    getEmailById,
     getUser,
     findByKey,
     createSocialUser,
     updateRefreshToken,
     tokenRefresh,
-    findByRefreshToken,
 };
 
 export default authService;

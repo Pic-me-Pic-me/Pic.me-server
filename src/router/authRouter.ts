@@ -4,6 +4,7 @@ import { body } from "express-validator";
 
 const router: Router = Router();
 
+//sign up with pic.me
 router.post(
     "/",
     [
@@ -15,6 +16,7 @@ router.post(
     authController.createUser
 );
 
+//sign in with pic.me
 router.post(
     "/signin",
     [
@@ -26,9 +28,20 @@ router.post(
     authController.signInUser
 );
 
-router.post("/token", authController.tokenRefresh);
-router.post("/kakao", authController.createSocialUser); // 회원가입
-router.post("/kakao/check", authController.findSocialUser); // 카카오에 존재하는지
-router.post("/kakao/signin", authController.loginSocialUser); //로그인
+// refresh accessToken
+router.post(
+    "/token",
+    [body("refreshToken").notEmpty(), body("accessToken").notEmpty()],
+    authController.tokenRefresh
+);
+
+// check kakao user
+router.post("/kakao/check", authController.findSocialUser);
+
+// sign up with kakao
+router.post("/kakao", authController.createSocialUser);
+
+// sign in with kakao
+router.post("/kakao/signin", authController.loginSocialUser);
 
 export default router;

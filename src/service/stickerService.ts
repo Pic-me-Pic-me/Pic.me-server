@@ -1,10 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { sc } from "../constants";
+import { rm, sc } from "../constants";
 import { StickerCreateDTO } from "../interfaces/StickerCreateDTO";
+import { PicmeException } from "../models/PicmeException";
 
 const prisma = new PrismaClient();
 
+/**
+ * find sticker by emoji, pictureId
+ *
+ * @param {Prisma.TransactionClient} tx prisma transaction client
+ * @param {number} pictureId picture unique id
+ * @param {number} emoji number of sticker emoji(1,2,3,4)
+ */
 const findSticker = async (tx: Prisma.TransactionClient, pictureId: number, emoji: number) => {
     const sticker = await tx.sticker.findFirst({
         where: {
@@ -16,6 +24,14 @@ const findSticker = async (tx: Prisma.TransactionClient, pictureId: number, emoj
     return sticker;
 };
 
+/**
+ * create sticker dataSet
+ *
+ * @param {Prisma.TransactionClient} tx prisma transaction client
+ * @param {string} parsedLocation parsed object array to string
+ * @param {number} pictureId picture unique id
+ * @param {number} emoji number of sticker emoji(1,2,3,4)
+ */
 const createSticker = async (
     tx: Prisma.TransactionClient,
     parsedLocation: string,
@@ -34,6 +50,13 @@ const createSticker = async (
     return createdSticker;
 };
 
+/**
+ * update sticker dataSet if exists
+ *
+ * @param {Prisma.TransactionClient} tx prisma transaction client
+ * @param {string} currentLocation updated and parsed object array to string
+ * @param {number} stickerId sticker unique id
+ */
 const updateSticker = async (
     tx: Prisma.TransactionClient,
     currentLocation: string,
@@ -53,6 +76,11 @@ const updateSticker = async (
     return updatedSticker;
 };
 
+/**
+ * paste sticker for specific picture of a vote
+ *
+ * @param {StickerCreateDTO} stickerCreateDto  DTO for creating sticker
+ */
 const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
     const picture = await prisma.picture.findUnique({
         where: {
@@ -60,7 +88,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
         },
     });
 
-    if (!picture) return null;
+    if (!picture) throw new PicmeException(sc.BAD_REQUEST, false, rm.PICTURE_NOT_EXIST);
 
     try {
         const data = await prisma.$transaction(async (tx) => {
@@ -81,13 +109,15 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
                     stickerCreateDto.emoji
                 );
             } else {
-                let parseCurrentLocation = JSON.parse(sticker.sticker_location as string);
-                stickerCreateDto.location.map((value: object) => {
-                    parseCurrentLocation.push(value);
-                });
-                parseCurrentLocation = JSON.stringify(parseCurrentLocation);
+                let parsedCurrentLocation = JSON.parse(sticker.sticker_location as string);
 
-                modifiedSticker = await updateSticker(tx, parseCurrentLocation, sticker.id);
+                stickerCreateDto.location.map((value: object) => {
+                    parsedCurrentLocation.push(value);
+                });
+
+                let currentLocation = JSON.stringify(parsedCurrentLocation);
+
+                modifiedSticker = await updateSticker(tx, currentLocation, sticker.id);
             }
 
             const picture = await tx.picture.update({
@@ -113,7 +143,7 @@ const stickerPaste = async (stickerCreateDto: StickerCreateDTO) => {
 
         return data;
     } catch (e) {
-        return sc.BAD_REQUEST;
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.STICKER_TRANSCTION_FAIL);
     }
 };
 
