@@ -1,0 +1,20 @@
+import CryptoJS from "crypto-js";
+const privateKey = process.env.CRYPTO_PRIVATE_KEY;
+
+const encodeVoteId = (voteId: number) => {
+    const encodedId = CryptoJS.AES.encrypt(voteId.toString(), privateKey as string).toString();
+    return encodeURIComponent(encodedId.toString());
+};
+
+const decodeVoteId = (encodedId: string) => {
+    const decodedId = decodeURIComponent(encodedId);
+    const voteId = CryptoJS.AES.decrypt(decodedId, privateKey as string).toString(
+        CryptoJS.enc.Utf8
+    );
+    return voteId;
+};
+
+export default {
+    encodeVoteId,
+    decodeVoteId,
+};
