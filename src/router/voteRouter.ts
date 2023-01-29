@@ -39,7 +39,7 @@ router.get("/library/month", voteController.getVoteReaminder);
 */
 
 // get current pictures in vote
-router.get("/common/:voteId", voteController.playerGetPictures);
+router.get("/common/pictures/:voteId", voteController.playerGetPictures);
 // router.get("/player/:voteId", voteController.playerGetPictures);
 
 // get current vote status
