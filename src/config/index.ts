@@ -1,22 +1,27 @@
 import dotenv from "dotenv";
 
-// Set the NODE_ENV to 'development' by default
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
+process.env.NODE_ENV === "production"
+    ? dotenv.config({ path: ".env.production" })
+    : dotenv.config({ path: ".env.development" });
 
-const envFound = dotenv.config();
-
-if (envFound.error) {
+if (!process.env.NODE_ENV) {
     throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 
 export default {
     port: parseInt(process.env.PORT as string, 10) as number,
 
-    //? 데이터베이스
+    // database
     database: process.env.DATABASE_URL as string,
 
-    //? AWS
+    // AWS
     s3AccessKey: process.env.S3_ACCESS_KEY as string,
     s3SecretKey: process.env.S3_SECRET_KEY as string,
     bucketName: process.env.S3_BUCKET as string,
+
+    //auth
+    jwtSecretKey: process.env.JWT_SECRET as string,
+
+    //
+    cryptoKey: process.env.CRYPTO_PRIVATE_KEY as string,
 };

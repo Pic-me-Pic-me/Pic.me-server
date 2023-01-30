@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import config from "../config";
 import { tokenType } from "../constants";
 
 const sign = (userId: number) => {
@@ -6,7 +7,7 @@ const sign = (userId: number) => {
         userId,
     };
 
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: "2h" });
+    const accessToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "2h" });
     return accessToken;
 };
 
@@ -15,7 +16,7 @@ const signRefresh = (userId: number) => {
         userId,
     };
 
-    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: "14d" });
+    const refreshToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "14d" });
     return refreshToken;
 };
 
@@ -23,7 +24,7 @@ const verify = (token: string) => {
     let decoded: string | jwt.JwtPayload;
 
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+        decoded = jwt.verify(token, config.jwtSecretKey);
     } catch (error: any) {
         if (error.message === "jwt expired") {
             return tokenType.TOKEN_EXPIRED;

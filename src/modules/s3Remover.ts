@@ -1,12 +1,13 @@
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3Config";
+import config from "../config/index";
 import { ObjectIdentifier } from "../interfaces/ObjectIdentifier";
 
 const deleteImages = async (urls: ObjectIdentifier[]) => {
     try {
         const data = await s3.send(
             new DeleteObjectsCommand({
-                Bucket: "picmeserver-bucket",
+                Bucket: config.bucketName,
                 Delete: {
                     Objects: urls,
                 },
