@@ -3,17 +3,18 @@ os: linux
 files:
     - source: /
       destination: /home/ubuntu/Pic.me-server
+      overwrite: yes
 permissions:
-    - object: /home/ubuntu/Pic.me-server
+    - object: /home/ubuntu
+      pattern: "**"
       owner: ubuntu
-    - object: /home/ubuntu/Pic.me-server/*/**
-      owner: ubuntu
+      group: ubuntu
 hooks:
     BeforeInstall:
         - location: scripts/delete-before-process.sh
           timeout: 300
-          runas: root
+          runas: ubuntu
     AfterInstall:
         - location: scripts/run-after-install.sh
           timeout: 300
-          runas: root
+          runas: ubuntu

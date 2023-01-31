@@ -10,7 +10,7 @@ cd $REPOSITORY
 
 pm2 kill
 
-yarn install
+yarn
 
 if [ "$DEPLOYMENT_GROUP_NAME" == "mainDeployGroup" ]
 then
