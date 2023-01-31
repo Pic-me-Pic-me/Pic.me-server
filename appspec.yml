@@ -12,6 +12,9 @@ permissions:
     group: ubuntu
 
 hooks:
+  BeforeInstall:
+    - location: scripts/delete-before-process.sh
+      runas: ubuntu
   AfterInstall:
     - location: scripts/run-after-deploy.sh
       runas: ubuntu
