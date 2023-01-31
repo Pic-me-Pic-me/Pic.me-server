@@ -3,6 +3,6 @@ REPOSITORY=/home/ubuntu/Pic.me-server
 
 cd $REPOSITORY
 
-yarn
+sudo yarn
 
-yarn run deploy:prod
+sudo yarn run deploy:prod

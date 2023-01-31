@@ -21,7 +21,7 @@ jobs:
                   aws-secret-access-key: ${{ secrets.MAIN_AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.MAIN_AWS_S3_REGION }}
 
-            ## create application.properties
+            ## create env
             - name: make env
               run: touch ./.env.production
               shell: bash
@@ -30,7 +30,7 @@ jobs:
               run: echo "${{ secrets.MAIN_ENVIRONMENT }}" > ./.env.production
               shell: bash
 
-            # build spring boot project
+            # build NodeJS project
             - name: build
               working-directory: ./
               run: |
