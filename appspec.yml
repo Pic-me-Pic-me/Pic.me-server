@@ -14,10 +14,6 @@ hooks:
           timeout: 300
           runas: root
     AfterInstall:
-        - location: scripts/change-permissions.sh
-          timeout: 300
-          runas: root
-    ApplicationStart:
-        - location: scripts/run-application.sh
+        - location: scripts/run-after-install.sh
           timeout: 300
           runas: root
