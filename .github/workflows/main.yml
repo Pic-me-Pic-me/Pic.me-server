@@ -33,7 +33,9 @@ jobs:
             # build spring boot project
             - name: build
               working-directory: ./
-              run: yarn run build
+              run: |
+                  yarn
+                  yarn run build
 
             # compress to zip file to upload to S3
             - name: compress files for deploy
