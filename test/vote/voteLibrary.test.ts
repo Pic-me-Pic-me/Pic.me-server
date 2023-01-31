@@ -29,8 +29,8 @@ const signIn = async () => {
 
     const { id, userName } = res.body.data;
 
-    expect(id).to.equal(68);
-    expect(userName).to.equal("test_943657549");
+    expect(id).to.equal(471);
+    expect(userName).to.equal("test_code_admin");
 
     return res.body.data.accessToken;
 };

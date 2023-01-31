@@ -26,8 +26,8 @@ const signIn = async () => {
 
     const { id, userName } = res.body.data;
 
-    expect(id).to.equal(68);
-    expect(userName).to.equal("test_943657549");
+    expect(id).to.equal(471);
+    expect(userName).to.equal("test_code_admin");
 
     return res.body.data.accessToken;
 };
@@ -47,29 +47,29 @@ describe("[GET] /vote/left", () => {
 
             const lastFlag = initResponse.body.data[4].id;
 
-            const leftRepsonse = await request(app)
+            const leftResponse = await request(app)
                 .get(`/vote/left?flag=${lastFlag}&date=202301`)
                 .set("Accept", "application/json")
                 .set("Authorization", "bearer " + res)
                 .type("application/json");
 
-            expect(leftRepsonse.status).to.equal(200);
+            expect(leftResponse.status).to.equal(200);
 
-            expect(leftRepsonse.body.data.length).to.equal(2);
+            expect(leftResponse.body.data.length).to.equal(2);
 
-            const endFlag = leftRepsonse.body.data[1].id;
+            const endFlag = leftResponse.body.data[1].id;
 
-            const endRepsonse = await request(app)
+            const endResponse = await request(app)
                 .get(`/vote/left?flag=${endFlag}&date=202301`)
                 .set("Accept", "application/json")
                 .set("Authorization", "bearer " + res)
                 .type("application/json");
 
-            expect(endRepsonse.status).to.equal(200);
+            expect(endResponse.status).to.equal(200);
 
-            expect(endRepsonse.body.data.length).to.equal(0);
+            expect(endResponse.body.data.length).to.equal(0);
 
-            assert.ok(endRepsonse);
+            assert.ok(endResponse);
             done();
         });
     });
