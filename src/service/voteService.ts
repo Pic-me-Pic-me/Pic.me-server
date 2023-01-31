@@ -6,13 +6,20 @@ import { VoteCreateDTO } from "./../interfaces/VoteCreateDTO";
 import { GetAllLibraryResultDTO } from "../interfaces/GetAllLibraryResultDTO";
 import { ObjectIdentifier } from "../interfaces/ObjectIdentifier";
 import { PrismaClient } from "@prisma/client";
+import { PicmeException } from "../models/PicmeException";
 import crypto from "../modules/crypto";
-import { sc } from "../constants";
+import { sc, rm } from "../constants";
 import dayjs from "dayjs";
 import s3Remover from "../modules/s3Remover";
 
 const prisma = new PrismaClient();
 
+/**
+ * create vote with pictures
+ *
+ * @param {number} userId unique id for each user
+ * @param {VoteCreateDTO} VoteCreateDTO vote information with pictures url, title, status, count
+ */
 const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     const data = await prisma.vote.create({
         data: {
@@ -31,7 +38,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
         },
     });
 
-    if (!data) return null;
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.CREATE_VOTE_FAIL);
 
     return crypto.encodeVoteId(data.id);
 };
@@ -63,6 +70,11 @@ const closeVote = async (voteId: number, userId: number) => {
     return data.id;
 };
 
+/**
+ * delete vote from library including stored pictures
+ *
+ * @param {number} voteId unique vote id
+ */
 const deleteVote = async (voteId: number) => {
     try {
         await prisma.$transaction(async (tx) => {
@@ -87,10 +99,8 @@ const deleteVote = async (voteId: number) => {
             });
         });
     } catch (error) {
-        console.log(error);
-        return sc.BAD_REQUEST;
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.TRANSACTION_FAILED);
     }
-
     return sc.OK;
 };
 
@@ -100,8 +110,9 @@ const findVoteById = async (userId: number, voteId: number) => {
             id: voteId,
         },
     });
-    if (!vote) return null;
-    if (vote.user_id != userId) return sc.BAD_REQUEST;
+    if (!vote) throw new PicmeException(sc.NOT_FOUND, false, rm.NOT_VOTE_ID);
+    if (vote.user_id != userId)
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.VOTE_USER_NOT_EQUAL);
     return vote;
 };
 

@@ -1,11 +1,17 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { authService, voteService } from "../service";
 import { rm, sc } from "../constants";
 import { fail, success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
 import crypto from "../modules/crypto";
+import { nextTick } from "process";
 
-const createVote = async (req: Request, res: Response) => {
+/**
+ * create vote
+ *
+ * @api {post} /vote
+ */
+const createVote = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
@@ -23,14 +29,21 @@ const createVote = async (req: Request, res: Response) => {
         pictures: locations,
         count: 0,
     };
+    try {
+        const data = await voteService.createVote(+userId, voteDTO);
 
-    const data = await voteService.createVote(+userId, voteDTO);
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CREATE_VOTE_FAIL));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS, data));
+        return res.status(sc.OK).send(success(sc.OK, rm.CREATE_VOTE_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
 };
 
-const deleteVote = async (req: Request, res: Response) => {
+/**
+ * delete vote from user
+ *
+ * @api {delete} /vote/:voteId
+ */
+const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
     const { voteId } = req.params;
 
     const userId = req.body.userId;
@@ -39,19 +52,15 @@ const deleteVote = async (req: Request, res: Response) => {
 
     if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
 
-    const vote = await voteService.findVoteById(userId, +voteId);
+    try {
+        const vote = await voteService.findVoteById(userId, +voteId);
 
-    if (!vote) return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NOT_VOTE_ID));
+        const result = await voteService.deleteVote(+voteId);
 
-    if (vote == sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_USER_NOT_EQUAL));
-
-    const result = await voteService.deleteVote(+voteId);
-
-    if (result == sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.TRANSACTION_FAILED));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
+        return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 const getSingleVote = async (req: Request, res: Response) => {
