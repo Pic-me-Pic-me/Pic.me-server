@@ -1,1 +1,1 @@
-rm -rf /home/ubuntu/Pic.me-server
+sudo rm -rf /home/ubuntu/Pic.me-server
