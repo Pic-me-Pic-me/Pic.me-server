@@ -1,0 +1,62 @@
+name: CD
+
+# activate when pushed to main branch
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build:
+        name: build & upload to s3
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.MAIN_AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.MAIN_AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.MAIN_AWS_S3_REGION }}
+
+            ## create application.properties
+            - name: make env
+              run: touch ./.env.production
+              shell: bash
+
+            - name: deliver application-prod.properties
+              run: echo "${{ secrets.MAIN_ENVIRONMENT }}" > ./.env.production
+              shell: bash
+
+            # build spring boot project
+            - name: build
+              working-directory: ./
+              run: yarn run build:prod
+
+            # compress to zip file to upload to S3
+            - name: compress files for deploy
+              run: zip -r picme.zip ./dist ./scripts ./appspec.yml ./.env.production ./package.json ./prisma
+
+            # upload to s3
+            - name: upload to s3
+              run: aws s3 cp picme.zip s3://${{ secrets.MAIN_AWS_S3_BUCKET }}
+
+    # jobs for CodeDeploy to do
+    deploy:
+        needs: build
+        name: deploy to ec2
+        runs-on: ubuntu-latest
+
+        steps:
+            # login in AWS
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.MAIN_AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.MAIN_AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.MAIN_AWS_S3_REGION }}
+            # process deploy
+            - name: deploy
+              run: aws deploy create-deployment --application-name picme --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name mainDeployGroup --s3-location bucket=${{ secrets.MAIN_AWS_S3_BUCKET }},bundleType=zip,key=picme.zip --region ${{ secrets.MAIN_AWS_S3_REGION }} --file-exists-behavior OVERWRITE
