@@ -15,6 +15,9 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
+    if(!req.body.title)
+        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+
     const locations = images.map((image: Express.MulterS3.File) => {
         return image.location;
     });
