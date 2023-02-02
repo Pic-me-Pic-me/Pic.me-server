@@ -8,9 +8,10 @@
     "license": "MIT",
     "scripts": {
         "start:dev": "cross-env NODE_ENV=development nodemon",
-        "build:dev": "cross-env NODE_ENV=development tsc && cross-env NODE_ENV=development node dist",
+        "deploy:dev": "cross-env NODE_ENV=development pm2 start dist",
         "start:prod": "cross-env NODE_ENV=production nodemon",
-        "build:prod": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production node dist",
+        "deploy:prod": "cross-env NODE_ENV=production pm2 start dist",
+        "build": "tsc",
         "db-pull:dev": "dotenv -e .env.development npx prisma db pull",
         "db-push:dev": "dotenv -e .env.development npx prisma db push",
         "generate:dev": "dotenv -e .env.development npx prisma generate",
