@@ -26,7 +26,7 @@ jobs:
               run: touch ./.env.development
               shell: bash
 
-            - name: deliver dev properties
+            - name: deliver dev env
               run: echo "${{ secrets.DEV_ENVIRONMENT }}" > ./.env.development
               shell: bash
 
