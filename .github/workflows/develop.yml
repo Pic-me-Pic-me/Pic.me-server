@@ -26,7 +26,7 @@ jobs:
               run: touch ./.env.development
               shell: bash
 
-            - name: deliver application-dev.properties
+            - name: deliver dev environment
               run: echo "${{ secrets.DEV_ENVIRONMENT }}" > ./.env.development
               shell: bash
 
@@ -61,4 +61,4 @@ jobs:
                   aws-region: ${{ secrets.DEV_AWS_S3_REGION }}
             # process deploy
             - name: deploy
-              run: aws deploy create-deployment --application-name picme --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name mainDeployGroup --s3-location bucket=${{ secrets.DEV_AWS_S3_BUCKET }},bundleType=zip,key=picme.zip --region ${{ secrets.DEV_AWS_S3_REGION }} --file-exists-behavior OVERWRITE
+              run: aws deploy create-deployment --application-name picme --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name testDeployGroup --s3-location bucket=${{ secrets.DEV_AWS_S3_BUCKET }},bundleType=zip,key=picme.zip --region ${{ secrets.DEV_AWS_S3_REGION }} --file-exists-behavior OVERWRITE
