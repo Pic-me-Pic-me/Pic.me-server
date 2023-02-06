@@ -407,7 +407,9 @@ const getVoteLibrary = async (userId: number, flag: number) => {
     return result;
 };
 
-const getVoteReaminder = async (userId: number, date: number, flag: number) => {
+const getVoteReminder = async (userId: number, date: number, flag: string) => {
+    const decodedId=crypto.decodeVoteId(flag);
+
     let voteData = await prisma.vote.findMany({
         where: {
             date: date as number,
@@ -433,7 +435,7 @@ const getVoteReaminder = async (userId: number, date: number, flag: number) => {
         },
         take: 5,
         skip: 1,
-        cursor: { id: flag },
+        cursor: { id: +decodedId },
     });
 
     const result = voteData.map((value: any) => {
@@ -544,7 +546,7 @@ const voteService = {
     playerGetVotedResult,
     getCurrentVotes,
     getVoteLibrary,
-    getVoteReaminder,
+    getVoteReminder,
 };
 
 export default voteService;

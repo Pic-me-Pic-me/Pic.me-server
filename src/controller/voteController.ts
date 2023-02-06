@@ -93,12 +93,12 @@ const getVoteLibrary = async (req: Request, res: Response) => {
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
 };
 
-const getVoteReaminder = async (req: Request, res: Response) => {
+const getVoteReminder = async (req: Request, res: Response) => {
     const { date, flag } = req.query;
 
     if (!date || !flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
 
-    const data = await voteService.getVoteReaminder(req.body.userId, +date, +flag);
+    const data = await voteService.getVoteReminder(req.body.userId, +date, flag as string);
 
     if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.INF_SCROLL_END, data));
 
@@ -154,7 +154,7 @@ const voteController = {
     playerGetVotedResult,
     closeVote,
     getCurrentVotes,
-    getVoteReaminder,
+    getVoteReminder,
 };
 
 export default voteController;
