@@ -1,5 +1,5 @@
 export interface SingleVoteGetDTO {
-    voteId: string | number;
+    voteId: string;
     voteStatus: boolean;
     voteTitle: string;
     currentVote: number;
