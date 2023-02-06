@@ -36,10 +36,11 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     return crypto.encodeVoteId(data.id);
 };
 
-const closeVote = async (voteId: number, userId: number) => {
+const closeVote = async (voteId: string, userId: number) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     const vote = await prisma.vote.findUnique({
         where: {
-            id: voteId,
+            id: decodedId,
         },
     });
 
@@ -51,7 +52,7 @@ const closeVote = async (voteId: number, userId: number) => {
 
     const data = await prisma.vote.update({
         where: {
-            id: voteId,
+            id: decodedId,
         },
         data: {
             status: false,
@@ -63,12 +64,13 @@ const closeVote = async (voteId: number, userId: number) => {
     return data.id;
 };
 
-const deleteVote = async (voteId: number) => {
+const deleteVote = async (voteId: string) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     try {
         await prisma.$transaction(async (tx) => {
             const pictures = await tx.picture.findMany({
                 where: {
-                    vote_id: voteId,
+                    vote_id: decodedId,
                 },
             });
 
@@ -82,7 +84,7 @@ const deleteVote = async (voteId: number) => {
 
             await tx.vote.delete({
                 where: {
-                    id: voteId,
+                    id: decodedId,
                 },
             });
         });
@@ -94,10 +96,11 @@ const deleteVote = async (voteId: number) => {
     return sc.OK;
 };
 
-const findVoteById = async (userId: number, voteId: number) => {
+const findVoteById = async (userId: number, voteId: string) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     const vote = await prisma.vote.findUnique({
         where: {
-            id: voteId,
+            id: decodedId,
         },
     });
     if (!vote) return null;
@@ -105,7 +108,8 @@ const findVoteById = async (userId: number, voteId: number) => {
     return vote;
 };
 
-const getSingleVote = async (voteId: number) => {
+const getSingleVote = async (voteId: string) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     const data = await prisma.vote.findUnique({
         select: {
             id: true,
@@ -132,7 +136,7 @@ const getSingleVote = async (voteId: number) => {
             },
         },
         where: {
-            id: voteId,
+            id: decodedId,
         },
     });
 
@@ -191,7 +195,8 @@ const getSingleVote = async (voteId: number) => {
     return resultDTO;
 };
 
-const getCurrentSingleVote = async (voteId: number) => {
+const getCurrentSingleVote = async (voteId: string) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     const data = await prisma.vote.findUnique({
         select: {
             id: true,
@@ -218,7 +223,7 @@ const getCurrentSingleVote = async (voteId: number) => {
             },
         },
         where: {
-            id: voteId,
+            id: decodedId,
         },
     });
 
@@ -449,7 +454,8 @@ const getVoteReaminder = async (userId: number, date: number, flag: number) => {
     플레이어
 */
 
-const playerGetPictures = async (voteId: number) => {
+const playerGetPictures = async (voteId: string) => {
+    const decodedId=+crypto.decodeVoteId(voteId);
     const data = await prisma.vote.findFirst({
         select: {
             id: true,
@@ -471,7 +477,7 @@ const playerGetPictures = async (voteId: number) => {
             },
         },
         where: {
-            id: voteId,
+            id: decodedId,
         },
     });
 
