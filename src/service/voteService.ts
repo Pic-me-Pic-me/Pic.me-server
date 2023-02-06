@@ -137,9 +137,10 @@ const getSingleVote = async (voteId: number) => {
     });
 
     if (!data) return null;
+    const encodedId=crypto.encodeVoteId(data.id);
 
     const resultDTO: SingleVoteGetDTO = {
-        voteId: data?.id as number,
+        voteId: encodedId as string,
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
         currentVote: data?.count as number,
@@ -222,9 +223,10 @@ const getCurrentSingleVote = async (voteId: number) => {
     });
 
     if (!data) return null;
+    const encodedId=crypto.encodeVoteId(data.id);
 
     const resultDTO: SingleVoteGetDTO = {
-        voteId: data?.id as number,
+        voteId: encodedId as string,
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
         currentVote: data?.count as number,
@@ -312,11 +314,11 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
         ...(!isFirstPage && pageCondition),
     });
 
-    if (data.length == 0) return null;
-
+    if (data.length == 0) return null;  
+    
     const result: CurrentVotesGetDTO[] = data.map((value: any) => {
         let DTOs = {
-            voteId: value.id as number,
+            voteId: crypto.encodeVoteId(value.id) as string,
             title: value.title as string,
             voteThumbnail: value.Picture[0]?.url as string,
             createdAt: value.created_at as string,
@@ -383,7 +385,7 @@ const getVoteLibrary = async (userId: number, flag: number) => {
                 date: value.date as number,
                 votes: voteData.map((value: any) => {
                     let votesDTO = {
-                        id: value.id,
+                        id: crypto.encodeVoteId(value.id),
                         title: value.title,
                         count: value.count,
                         url: value.Picture[0].url,
@@ -431,7 +433,7 @@ const getVoteReaminder = async (userId: number, date: number, flag: number) => {
 
     const result = voteData.map((value: any) => {
         let votesDTO = {
-            id: value.id,
+            id: crypto.encodeVoteId(value.id),
             title: value.title,
             count: value.count,
             url: value.Picture[0].url,
@@ -475,9 +477,11 @@ const playerGetPictures = async (voteId: number) => {
 
     if (!data) return null;
 
+    const encodedId=crypto.encodeVoteId(data.id);
+
     const resultDTO: PlayerPicturesGetDTO = {
         userName: data?.User.user_name as string,
-        voteId: data?.id as number,
+        voteId: encodedId as string,
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
         Picture: data?.Picture as object[],
