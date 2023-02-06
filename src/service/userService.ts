@@ -1,11 +1,17 @@
 import { PrismaClient } from "@prisma/client";
-import { sc } from "../constants";
+import { rm, sc } from "../constants";
 import { GetUserInfoDTO } from "../interfaces/GetUserInfoDTO";
 import { ObjectIdentifier } from "../interfaces/ObjectIdentifier";
+import { PicmeException } from "../models/PicmeException";
 import s3Remover from "../modules/s3Remover";
 
 const prisma = new PrismaClient();
 
+/**
+ * get user's info by unique userNum
+ *
+ * @param {number} userId unqiue user id
+ */
 const getUserInfo = async (userId: number) => {
     const data = await prisma.user.findUnique({
         select: {
@@ -17,7 +23,7 @@ const getUserInfo = async (userId: number) => {
         },
     });
 
-    if (!data) return null;
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.CANT_GET_USERINFO);
 
     const resultDTO: GetUserInfoDTO = {
         userName: data?.user_name as string,
@@ -27,6 +33,11 @@ const getUserInfo = async (userId: number) => {
     return resultDTO;
 };
 
+/**
+ * check whether if the nickname is in use
+ *
+ * @param {string} userName requested userName
+ */
 const checkUserName = async (userName: string) => {
     const data = await prisma.user.findFirst({
         where: {
@@ -34,11 +45,16 @@ const checkUserName = async (userName: string) => {
         },
     });
 
-    if (!data) return sc.OK;
+    if (data) throw new PicmeException(sc.BAD_REQUEST, false, rm.USER_NAME_DUPLICATE);
 
-    if (data) return sc.CONFLICT;
+    if (!data) return sc.OK;
 };
 
+/**
+ * withdraw from picme
+ *
+ * @param {number} userId unique user id
+ */
 const deleteUser = async (userId: number) => {
     const check = await prisma.user.findFirst({
         where: {
@@ -46,7 +62,7 @@ const deleteUser = async (userId: number) => {
         },
     });
 
-    if (!check) return sc.NOT_FOUND;
+    if (!check) throw new PicmeException(sc.BAD_REQUEST, false, rm.DELETE_USER_FAIL);
 
     try {
         await prisma.$transaction(async (tx) => {
@@ -104,7 +120,7 @@ const deleteUser = async (userId: number) => {
         });
     } catch (error) {
         console.log(error);
-        return sc.BAD_REQUEST;
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.DELETE_USER_FAIL);
     }
 
     return sc.OK;

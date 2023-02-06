@@ -1,34 +1,55 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { rm, sc } from "../constants";
-import { fail, success } from "../constants/response";
-import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
+import { success } from "../constants/response";
 import userService from "../service/userService";
 
-const getUserInfo = async (req: Request, res: Response) => {
+/**
+ * get user's profile info
+ *
+ * @api {GET} /user
+ */
+const getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
-    const data = await userService.getUserInfo(+userId);
+    try {
+        const data = await userService.getUserInfo(+userId);
 
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CANT_GET_USERINFO));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.GET_USER_INFO, data));
+        return res.status(sc.OK).send(success(sc.OK, rm.GET_USER_INFO, data));
+    } catch (e) {
+        return next(e);
+    }
 };
 
-const checkUserName = async (req: Request, res: Response) => {
+/**
+ * check if user's nickname is duplicated
+ *
+ * @api {GET} /user/name
+ */
+const checkUserName = async (req: Request, res: Response, next: NextFunction) => {
     const { userName } = req.query;
-    const result = await userService.checkUserName(userName as string);
+    try {
+        await userService.checkUserName(userName as string);
 
-    if (result == sc.OK) return res.status(sc.OK).send(success(sc.OK, rm.UNIQUE_USER_NAME));
-    return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, "중복된 아이디가 있습니다."));
+        return res.status(sc.OK).send(success(sc.OK, rm.UNIQUE_USER_NAME));
+    } catch (e) {
+        return next(e);
+    }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+/**
+ * withdraw from picme
+ *
+ * @api {DELETE} /user
+ */
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
-    const result = await userService.deleteUser(+userId);
 
-    if (result == sc.NOT_FOUND)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.NO_CONTENT, rm.DELETE_USER_FAIL));
+    try {
+        await userService.deleteUser(+userId);
 
-    return res.status(sc.OK).send(success(sc.OK, rm.DELETE_USER_SUCCESS));
+        return res.status(sc.OK).send(success(sc.OK, rm.DELETE_USER_SUCCESS));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 const userController = {

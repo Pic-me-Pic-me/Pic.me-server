@@ -87,6 +87,7 @@ const signInUser = async (req: Request, res: Response) => {
  */
 const createSocialUser = async (req: Request, res: Response, next: NextFunction) => {
     const { uid, socialType, userName, email } = req.body;
+
     try {
         let existUser = await authService.findByKey(uid, socialType);
 
@@ -99,12 +100,14 @@ const createSocialUser = async (req: Request, res: Response, next: NextFunction)
             return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_NICKNAME));
 
         const accessToken = jwtHandler.sign(data.id);
+
         const result = {
             id: data.id,
             userName: userName,
             accessToken: accessToken,
             refreshToken: data.refresh_token,
         };
+
         return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
     } catch (e) {
         return next(e);
@@ -121,6 +124,7 @@ const findSocialUser = async (req: Request, res: Response, next: NextFunction) =
 
     if (!socialType || !token)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+
     try {
         const user = await authService.getUser(socialType, token);
 
@@ -130,6 +134,7 @@ const findSocialUser = async (req: Request, res: Response, next: NextFunction) =
             email: (user as SocialUser).email,
             isUser: true,
         };
+
         if (!existUser) {
             data.isUser = false;
             return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
