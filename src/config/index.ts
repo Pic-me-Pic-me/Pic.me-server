@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
 process.env.NODE_ENV === "production"
-    ? dotenv.config({ path: ".env.production" })
-    : dotenv.config({ path: ".env.development" });
+    ? dotenv.config({ path: `${__dirname}/../../.env.production` })
+    : dotenv.config({ path: `${__dirname}/../../.env.development` });
 
 if (!process.env.NODE_ENV) {
     throw new Error("⚠️  Couldn't find .env file  ⚠️");
