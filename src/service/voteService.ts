@@ -76,7 +76,7 @@ const closeVote = async (voteId: string, userId: number) => {
  *
  * @param {number} voteId unique vote id
  */
-const deleteVote = async (voteId: number) => {
+const deleteVote = async (voteId: string) => {
     const decodedId=+crypto.decodeVoteId(voteId);
     try {
         await prisma.$transaction(async (tx) => {

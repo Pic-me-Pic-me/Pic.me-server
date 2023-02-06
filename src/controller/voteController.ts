@@ -56,9 +56,9 @@ const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
     if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
 
     try {
-        const vote = await voteService.findVoteById(userId, +voteId);
+        const vote = await voteService.findVoteById(userId, voteId);
 
-        const result = await voteService.deleteVote(+voteId);
+        const result = await voteService.deleteVote(voteId);
 
         return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
     } catch (e) {
