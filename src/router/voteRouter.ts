@@ -26,7 +26,7 @@ router.patch("/:voteId", voteController.closeVote);
 router.get("/library/scroll/all", voteController.getVoteLibrary);
 
 // get single month library -> right infinite scroll
-router.get("/library/scroll/month", voteController.getVoteReaminder);
+router.get("/library/scroll/month", voteController.getVoteReminder);
 
 /*
     플레이어

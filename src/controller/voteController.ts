@@ -56,9 +56,9 @@ const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
     if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
 
     try {
-        const vote = await voteService.findVoteById(userId, +voteId);
+        const vote = await voteService.findVoteById(userId, voteId);
 
-        const result = await voteService.deleteVote(+voteId);
+        const result = await voteService.deleteVote(voteId);
 
         return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
     } catch (e) {
@@ -68,7 +68,7 @@ const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
 
 const getSingleVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-    const data = await voteService.getSingleVote(+voteId);
+    const data = await voteService.getSingleVote(voteId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
 
@@ -77,7 +77,7 @@ const getSingleVote = async (req: Request, res: Response) => {
 
 const getCurrentSingleVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-    const data = await voteService.getCurrentSingleVote(+voteId);
+    const data = await voteService.getCurrentSingleVote(voteId);
 
     if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
 
@@ -105,12 +105,12 @@ const getVoteLibrary = async (req: Request, res: Response) => {
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
 };
 
-const getVoteReaminder = async (req: Request, res: Response) => {
+const getVoteReminder = async (req: Request, res: Response) => {
     const { date, flag } = req.query;
 
     if (!date || !flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
 
-    const data = await voteService.getVoteReaminder(req.body.userId, +date, +flag);
+    const data = await voteService.getVoteReminder(req.body.userId, +date, flag as string);
 
     if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.INF_SCROLL_END, data));
 
@@ -123,8 +123,7 @@ const getVoteReaminder = async (req: Request, res: Response) => {
 
 const playerGetPictures = async (req: Request, res: Response) => {
     const { voteId } = req.params;
-    const decodedVoteId = crypto.decodeVoteId(voteId);
-    const data = await voteService.playerGetPictures(+decodedVoteId);
+    const data = await voteService.playerGetPictures(voteId);
     if (!data)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
     if (data.voteStatus == false)
@@ -147,7 +146,7 @@ const closeVote = async (req: Request, res: Response) => {
     const { voteId } = req.params;
     const { userId } = req.body;
 
-    const result = await voteService.closeVote(+voteId, userId);
+    const result = await voteService.closeVote(voteId, userId);
     if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
     if (result == sc.UNAUTHORIZED)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
@@ -167,7 +166,7 @@ const voteController = {
     playerGetVotedResult,
     closeVote,
     getCurrentVotes,
-    getVoteReaminder,
+    getVoteReminder,
 };
 
 export default voteController;

@@ -1,5 +1,5 @@
 export interface CurrentVotesGetDTO {
-    voteId: number;
+    voteId: string;
     title: string;
     voteThumbnail: string;
     createdAt: string;

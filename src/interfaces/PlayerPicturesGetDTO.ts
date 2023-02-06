@@ -1,6 +1,6 @@
 export interface PlayerPicturesGetDTO {
     userName: string;
-    voteId: number;
+    voteId: string;
     voteStatus: boolean;
     voteTitle: string;
     Picture: object[];
