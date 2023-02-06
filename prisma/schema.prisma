@@ -39,7 +39,7 @@ model Picture {
 }
 
 model AuthenticationProvider {
-  id            Int    @id
+  id            BigInt @id
   provider_type String @db.VarChar(20)
   user_id       Int
   User          User   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "authenticationprovider_user_id_fk")
