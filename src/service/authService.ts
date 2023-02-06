@@ -3,6 +3,7 @@ import kakaoAuth from "../config/kakaoAuth";
 import { PrismaClient } from "@prisma/client";
 import jwtHandler from "../modules/jwtHandler";
 import { sc, rm, socialType } from "../constants";
+import { PicmeException } from "../models/PicmeException";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
 import { tokenRefreshDTO } from "../interfaces/tokenRefreshDTO";
@@ -67,8 +68,9 @@ const findByKey = async (kakaoId: number, socialType: string) => {
             provider_type: socialType,
         },
     });
-    if (!auth) return null;
+    if (!auth) throw new PicmeException(sc.BAD_REQUEST, false, rm.CHECK_KAKAO_USER_FAIL);
     const user = await findById(auth.user_id);
+    if (!user) throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_USER);
     return user;
 };
 
@@ -126,9 +128,10 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
  * @param {string} token kakao API access token
  */
 const getUser = async (social: string, token: string) => {
-    if (social != socialType.KAKAO) return rm.NO_SOCIAL_TYPE;
+    if (social != socialType.KAKAO)
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_SOCIAL_TYPE);
     const user = await kakaoAuth(token);
-    if (!user) return null;
+    if (!user) throw new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_TOKEN);
     return user;
 };
 
@@ -150,7 +153,7 @@ const createSocialUser = async (email: string, nickname: string, kakaoId: number
         },
     });
 
-    const auth = await prisma.authenticationProvider.create({
+    await prisma.authenticationProvider.create({
         data: {
             user_id: user.id,
             provider_type: socialType.KAKAO,

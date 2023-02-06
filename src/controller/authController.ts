@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { authService } from "../service";
 import { rm, sc } from "../constants";
@@ -85,25 +85,30 @@ const signInUser = async (req: Request, res: Response) => {
  *
  * @api {post} /auth/kakao
  */
-const createSocialUser = async (req: Request, res: Response) => {
+const createSocialUser = async (req: Request, res: Response, next: NextFunction) => {
     const { uid, socialType, userName, email } = req.body;
+    try {
+        let existUser = await authService.findByKey(uid, socialType);
 
-    let existUser = await authService.findByKey(uid, socialType);
+        if (existUser)
+            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
 
-    if (existUser) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
+        const data = await authService.createSocialUser(email, userName, uid);
 
-    const data = await authService.createSocialUser(email, userName, uid);
+        if (!data)
+            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_NICKNAME));
 
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_NICKNAME));
-
-    const accessToken = jwtHandler.sign(data.id);
-    const result = {
-        id: data.id,
-        userName: userName,
-        accessToken: accessToken,
-        refreshToken: data.refresh_token,
-    };
-    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
+        const accessToken = jwtHandler.sign(data.id);
+        const result = {
+            id: data.id,
+            userName: userName,
+            accessToken: accessToken,
+            refreshToken: data.refresh_token,
+        };
+        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 /**
@@ -111,30 +116,29 @@ const createSocialUser = async (req: Request, res: Response) => {
  *
  * @api {post} /auth/kakao/check
  */
-const findSocialUser = async (req: Request, res: Response) => {
+const findSocialUser = async (req: Request, res: Response, next: NextFunction) => {
     const { socialType, token } = req.body;
 
     if (!socialType || !token)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    try {
+        const user = await authService.getUser(socialType, token);
 
-    const user = await authService.getUser(socialType, token);
+        const existUser = await authService.findByKey((user as SocialUser).userId, socialType);
+        let data = {
+            uid: (user as SocialUser).userId,
+            email: (user as SocialUser).email,
+            isUser: true,
+        };
+        if (!existUser) {
+            data.isUser = false;
+            return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
+        }
 
-    if (!user) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
-    if (user == rm.NO_SOCIAL_TYPE)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_TYPE));
-    if (user == rm.NO_SOCIAL_USER)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_SOCIAL_USER));
-    const existUser = await authService.findByKey((user as SocialUser).userId, socialType);
-    let data = {
-        uid: (user as SocialUser).userId,
-        email: (user as SocialUser).email,
-        isUser: true,
-    };
-    if (!existUser) {
-        data.isUser = false;
         return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
+    } catch (e) {
+        return next(e);
     }
-    return res.status(sc.OK).send(success(sc.OK, rm.CHECK_KAKAO_USER_SUCCESS, data));
 };
 
 /**
@@ -142,26 +146,28 @@ const findSocialUser = async (req: Request, res: Response) => {
  *
  * @api {post} /auth/kakao/signin
  */
-const loginSocialUser = async (req: Request, res: Response) => {
+const loginSocialUser = async (req: Request, res: Response, next: NextFunction) => {
     const { uid, socialType } = req.body;
 
     if (!uid || !socialType)
         return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
-    const existUser = await authService.findByKey(uid, socialType);
 
-    if (!existUser)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CHECK_KAKAO_USER_FAIL));
+    try {
+        const existUser = await authService.findByKey(uid, socialType);
 
-    const updatedUser = await authService.updateRefreshToken(existUser.id);
-    const accessToken = jwtHandler.sign(updatedUser.id);
-    const result = {
-        id: updatedUser.id,
-        user_name: updatedUser.user_name,
-        accessToken: accessToken,
-        refreshToken: updatedUser.refresh_token,
-    };
+        const updatedUser = await authService.updateRefreshToken(existUser.id);
+        const accessToken = jwtHandler.sign(updatedUser.id);
+        const result = {
+            id: updatedUser.id,
+            user_name: updatedUser.user_name,
+            accessToken: accessToken,
+            refreshToken: updatedUser.refresh_token,
+        };
 
-    return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
+        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 /**
