@@ -36,12 +36,29 @@ router.post(
 );
 
 // check kakao user
-router.post("/kakao/check", authController.findSocialUser);
+router.post(
+    "/kakao/check",
+    [body("socialType").notEmpty(), body("token").notEmpty()],
+    authController.findSocialUser
+);
 
 // sign up with kakao
-router.post("/kakao", authController.createSocialUser);
+router.post(
+    "/kakao",
+    [
+        body("uid").notEmpty(),
+        body("socialType").notEmpty(),
+        body("userName").notEmpty(),
+        body("email").notEmpty(),
+    ],
+    authController.createSocialUser
+);
 
 // sign in with kakao
-router.post("/kakao/signin", authController.loginSocialUser);
+router.post(
+    "/kakao/signin",
+    [body("uid").notEmpty(), body("socialType").notEmpty()],
+    authController.loginSocialUser
+);
 
 export default router;

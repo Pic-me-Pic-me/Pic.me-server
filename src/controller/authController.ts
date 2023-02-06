@@ -10,35 +10,38 @@ import { fail, success } from "../constants/response";
 import { JwtPayload } from "jsonwebtoken";
 import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
+import { PicmeException } from "../models/PicmeException";
 
 /**
  * sign up with pic.me authentication
  *
  * @api {post} /auth
  */
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
+
     if (!error.isEmpty()) {
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
     }
 
     const userCreateDto: UserCreateDTO = req.body;
-    const data = await authService.createUser(userCreateDto);
 
-    if (!data) {
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.SIGNUP_FAIL));
+    try {
+        const data = await authService.createUser(userCreateDto);
+
+        const accessToken = jwtHandler.sign(data.id);
+
+        const result = {
+            id: data.id,
+            userName: data.user_name,
+            refreshToken: data.refresh_token,
+            accessToken,
+        };
+
+        return res.status(sc.CREATED).send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
+    } catch (e) {
+        return next(e);
     }
-
-    const accessToken = jwtHandler.sign(data.id);
-
-    const result = {
-        id: data.id,
-        userName: data.user_name,
-        refreshToken: data.refresh_token,
-        accessToken,
-    };
-
-    return res.status(sc.CREATED).send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
 };
 
 /**
@@ -46,20 +49,17 @@ const createUser = async (req: Request, res: Response) => {
  *
  * @api {post} /auth/signin
  */
-const signInUser = async (req: Request, res: Response) => {
+const signInUser = async (req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
+
     if (!error.isEmpty()) {
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
     }
 
     const userSignInDto: UserSignInDTO = req.body;
 
     try {
         const data = await authService.signIn(userSignInDto);
-
-        if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_EMAIL));
-        else if (data === sc.UNAUTHORIZED)
-            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_PASSWORD));
 
         const user = await authService.updateRefreshToken(data);
 
@@ -72,11 +72,9 @@ const signInUser = async (req: Request, res: Response) => {
             accessToken,
         };
 
-        res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
+        return res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
     } catch (e) {
-        res.status(sc.INTERNAL_SERVER_ERROR).send(
-            fail(sc.INTERNAL_SERVER_ERROR, rm.INTERNAL_SERVER_ERROR)
-        );
+        return next(e);
     }
 };
 
@@ -86,18 +84,20 @@ const signInUser = async (req: Request, res: Response) => {
  * @api {post} /auth/kakao
  */
 const createSocialUser = async (req: Request, res: Response, next: NextFunction) => {
+    const error = validationResult(req);
+
+    if (!error.isEmpty()) {
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    }
+
     const { uid, socialType, userName, email } = req.body;
 
     try {
         let existUser = await authService.findByKey(uid, socialType);
 
-        if (existUser)
-            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_USER));
+        if (existUser) return next(new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_USER));
 
         const data = await authService.createSocialUser(email, userName, uid);
-
-        if (!data)
-            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_NICKNAME));
 
         const accessToken = jwtHandler.sign(data.id);
 
@@ -120,15 +120,19 @@ const createSocialUser = async (req: Request, res: Response, next: NextFunction)
  * @api {post} /auth/kakao/check
  */
 const findSocialUser = async (req: Request, res: Response, next: NextFunction) => {
-    const { socialType, token } = req.body;
+    const error = validationResult(req);
 
-    if (!socialType || !token)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!error.isEmpty()) {
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    }
+
+    const { socialType, token } = req.body;
 
     try {
         const user = await authService.getUser(socialType, token);
 
         const existUser = await authService.findByKey((user as SocialUser).userId, socialType);
+
         let data = {
             uid: (user as SocialUser).userId,
             email: (user as SocialUser).email,
@@ -152,16 +156,24 @@ const findSocialUser = async (req: Request, res: Response, next: NextFunction) =
  * @api {post} /auth/kakao/signin
  */
 const loginSocialUser = async (req: Request, res: Response, next: NextFunction) => {
-    const { uid, socialType } = req.body;
+    const error = validationResult(req);
 
-    if (!uid || !socialType)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!error.isEmpty()) {
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    }
+
+    const { uid, socialType } = req.body;
 
     try {
         const existUser = await authService.findByKey(uid, socialType);
 
-        const updatedUser = await authService.updateRefreshToken(existUser.id);
+        if (!existUser)
+            return next(new PicmeException(sc.BAD_REQUEST, false, rm.CHECK_KAKAO_USER_FAIL));
+
+        const updatedUser = await authService.updateRefreshToken(existUser!.id);
+
         const accessToken = jwtHandler.sign(updatedUser.id);
+
         const result = {
             id: updatedUser.id,
             user_name: updatedUser.user_name,
@@ -180,11 +192,11 @@ const loginSocialUser = async (req: Request, res: Response, next: NextFunction) 
  *
  * @api {post} /auth/token
  */
-const tokenRefresh = async (req: Request, res: Response) => {
+const tokenRefresh = async (req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
 
     if (!error.isEmpty()) {
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EMPTY_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
     }
 
     const tokenRefreshDto: tokenRefreshDTO = req.body;
@@ -195,35 +207,39 @@ const tokenRefresh = async (req: Request, res: Response) => {
 
     // refreshToken, accessToken all expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED && decoded === tokenType.TOKEN_EXPIRED)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_ALL_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.EXPIRED_ALL_TOKEN));
 
     // refreshToken expired
     if (refreshDecoded === tokenType.TOKEN_EXPIRED)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.EXPIRED_REFRESH_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.EXPIRED_REFRESH_TOKEN));
 
     // refreshToken or accessToken invalid
     if (refreshDecoded === tokenType.TOKEN_INVALID || decoded === tokenType.TOKEN_INVALID)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_TOKEN));
 
     // accessToken still valid
     const accessDecodedUID: number = (decoded as JwtPayload).userId;
     if (accessDecodedUID)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VALID_ACCESS_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.VALID_ACCESS_TOKEN));
 
     const refreshDecodedUID: number = (refreshDecoded as JwtPayload).userId;
     if (!refreshDecodedUID)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.INVALID_REFRESH_TOKEN));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_REFRESH_TOKEN));
 
-    const newAccessToken = await authService.tokenRefresh(refreshDecodedUID, tokenRefreshDto);
+    try {
+        const newAccessToken = await authService.tokenRefresh(refreshDecodedUID, tokenRefreshDto);
 
-    if (!newAccessToken)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TOKEN_OWNER));
+        if (!newAccessToken)
+            return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TOKEN_OWNER));
 
-    const result = {
-        accessToken: newAccessToken,
-    };
+        const result = {
+            accessToken: newAccessToken,
+        };
 
-    return res.status(sc.OK).send(success(sc.OK, rm.CREATE_TOKEN_SUCCESS, result));
+        return res.status(sc.OK).send(success(sc.OK, rm.CREATE_TOKEN_SUCCESS, result));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 const authController = {
