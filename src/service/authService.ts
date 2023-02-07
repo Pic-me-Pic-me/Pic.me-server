@@ -68,9 +68,13 @@ const findByKey = async (kakaoId: number, socialType: string) => {
             provider_type: socialType,
         },
     });
-    if (!auth) throw new PicmeException(sc.BAD_REQUEST, false, rm.CHECK_KAKAO_USER_FAIL);
+
+    if (!auth) return null;
+
     const user = await findById(auth.user_id);
-    if (!user) throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_USER);
+
+    if (!user) return null;
+
     return user;
 };
 
@@ -80,8 +84,10 @@ const findByKey = async (kakaoId: number, socialType: string) => {
  * @param {UserCreateDTO} userCreateDto DTO for creating user
  */
 const createUser = async (userCreateDto: UserCreateDTO) => {
-    if (await chkByEmail(userCreateDto.email)) return null;
-    if (await chkByUserName(userCreateDto?.username)) return null;
+    if (await chkByEmail(userCreateDto.email))
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_EMAIL);
+    if (await chkByUserName(userCreateDto?.username))
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_NICKNAME);
 
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(userCreateDto.password, salt);
@@ -109,11 +115,11 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
     try {
         const user = await chkByEmail(userSignInDto.email);
 
-        if (!user) return null;
+        if (!user) throw new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_EMAIL);
 
         const isMatch = await bcrypt.compare(userSignInDto.password, user.password!);
 
-        if (!isMatch) return sc.UNAUTHORIZED;
+        if (!isMatch) throw new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_PASSWORD);
 
         return user.id;
     } catch (error) {
@@ -130,8 +136,11 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
 const getUser = async (social: string, token: string) => {
     if (social != socialType.KAKAO)
         throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_SOCIAL_TYPE);
+
     const user = await kakaoAuth(token);
+
     if (!user) throw new PicmeException(sc.BAD_REQUEST, false, rm.INVALID_TOKEN);
+
     return user;
 };
 
@@ -143,7 +152,9 @@ const getUser = async (social: string, token: string) => {
  * @param {number} kakaoId unique kakao id provided by kakao
  */
 const createSocialUser = async (email: string, nickname: string, kakaoId: number) => {
-    if (await chkByUserName(nickname)) return null;
+    if (await chkByUserName(nickname))
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_NICKNAME);
+
     const user = await prisma.user.create({
         data: {
             user_name: nickname,
@@ -160,7 +171,9 @@ const createSocialUser = async (email: string, nickname: string, kakaoId: number
             id: kakaoId,
         },
     });
+
     const data = await updateRefreshToken(user.id);
+
     return data;
 };
 
@@ -171,6 +184,7 @@ const createSocialUser = async (email: string, nickname: string, kakaoId: number
  */
 const updateRefreshToken = async (userId: number) => {
     const refreshToken = jwtHandler.signRefresh(userId);
+
     const data = await prisma.user.update({
         where: {
             id: userId,
@@ -179,6 +193,8 @@ const updateRefreshToken = async (userId: number) => {
             refresh_token: refreshToken,
         },
     });
+
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.REFRESH_FAIL);
 
     return data;
 };
@@ -192,7 +208,8 @@ const updateRefreshToken = async (userId: number) => {
 const tokenRefresh = async (userId: number, tokenRefreshDto: tokenRefreshDTO) => {
     const user = await findById(userId);
 
-    if (user?.refresh_token != tokenRefreshDto.refreshToken) return null;
+    if (user?.refresh_token != tokenRefreshDto.refreshToken)
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.NOT_TOKEN_OWNER);
 
     const accessToken = jwtHandler.sign(userId);
 

@@ -10,11 +10,13 @@ export default {
     SIGNIN_SUCCESS: "로그인 성공",
     SIGNIN_FAIL: "로그인 실패",
     ALREADY_NICKNAME: "이미 사용중인 닉네임입니다.",
+    ALREADY_EMAIL: "이미 사용중인 이메일입니다.",
     SOCIAL_SIGNIN_SUCCESS: "소셜 로그인 성공",
     SOCIAL_SIGNUP_SUCCESS: "소셜 회원가입 성공",
     CHECK_KAKAO_USER_SUCCESS: "카카오 계정 확인 성공",
     CHECK_KAKAO_USER_FAIL: "카카오 계정 확인 실패",
     ALREADY_USER: "이미 회원가입 된 유저입니다.",
+    REFRESH_FAIL: "토큰 갱신 실패",
     // user
     READ_USER_SUCCESS: "유저 조회 성공",
     READ_USER_FAIL: "유저 조회 실패",
@@ -34,6 +36,7 @@ export default {
     CANT_GET_USERINFO: "유저 아이디를 갖고올 수 없습니다.",
     GET_USER_INFO: "유저 정보 갖고오기 성공",
     UNIQUE_USER_NAME: "중복 검사 완료! 중복되는 이름이 없습니다. ",
+    USER_NAME_DUPLICATE: "중복된 아이디가 있습니다.",
 
     // token
     CREATE_TOKEN_SUCCESS: "토큰 재발급 성공",
@@ -67,6 +70,7 @@ export default {
     DELETE_VOTE_FAIL: "투표 삭제 실패",
     VOTE_USER_NOT_EQUAL: "투표 사용자의 투표가 아닙니다.",
     PLAYER_GET_VOTED_RESULT_SUCCESS: "투표와 스티커 가져오기를 성공 했습니다.",
+    CURRENT_DATA_END: "더이상 데이터가 없습니다.",
     LIBRARY_GET_SUCCESS: "라이브러리 조회 성공",
     LIBRARY_NO_DATA: "저장된 투표가 없습니다.",
     LIBRARY_GET_FAIL: "라이브러리 조회 실패",
