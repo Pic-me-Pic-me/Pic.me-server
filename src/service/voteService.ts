@@ -43,19 +43,26 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
     return crypto.encodeVoteId(data.id);
 };
 
+/**
+ * create vote with pictures
+ *
+ * @param {number} userId unique id for each user
+ * @param {string} voteId hashed vote id
+ */
 const closeVote = async (voteId: string, userId: number) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     const vote = await prisma.vote.findUnique({
         where: {
             id: decodedId,
         },
     });
 
-    if (!vote) return null;
+    if (!vote) throw new PicmeException(sc.BAD_REQUEST, false, rm.CLOSE_VOTE_FAIL);
 
-    if (vote.user_id != userId) return sc.UNAUTHORIZED;
+    if (vote.user_id != userId) throw new PicmeException(sc.BAD_REQUEST, false, rm.VOTE_NOT_ADMIN);
 
-    if (!vote.status) return sc.BAD_REQUEST;
+    if (!vote.status) throw new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_CLOSED_VOTE);
 
     const data = await prisma.vote.update({
         where: {
@@ -66,7 +73,7 @@ const closeVote = async (voteId: string, userId: number) => {
         },
     });
 
-    if (!data) return null;
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.CLOSE_VOTE_FAIL);
 
     return data.id;
 };
@@ -74,10 +81,11 @@ const closeVote = async (voteId: string, userId: number) => {
 /**
  * delete vote from library including stored pictures
  *
- * @param {number} voteId unique vote id
+ * @param {string} voteId hashed vote id
  */
 const deleteVote = async (voteId: string) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     try {
         await prisma.$transaction(async (tx) => {
             const pictures = await tx.picture.findMany({
@@ -106,21 +114,37 @@ const deleteVote = async (voteId: string) => {
     return sc.OK;
 };
 
+/**
+ * find vote by vote id and check its ownership
+ *
+ * @param {number} userId unqiue user id
+ * @param {string} userId hashed vote id
+ */
 const findVoteById = async (userId: number, voteId: string) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     const vote = await prisma.vote.findUnique({
         where: {
             id: decodedId,
         },
     });
+
     if (!vote) throw new PicmeException(sc.NOT_FOUND, false, rm.NOT_VOTE_ID);
+
     if (vote.user_id != userId)
         throw new PicmeException(sc.BAD_REQUEST, false, rm.VOTE_USER_NOT_EQUAL);
+
     return vote;
 };
 
+/**
+ * get single vote for library
+ *
+ * @param {string} voteId hashed vote id
+ */
 const getSingleVote = async (voteId: string) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     const data = await prisma.vote.findUnique({
         select: {
             id: true,
@@ -151,8 +175,9 @@ const getSingleVote = async (voteId: string) => {
         },
     });
 
-    if (!data) return null;
-    const encodedId=crypto.encodeVoteId(data.id);
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.GET_VOTE_FAIL);
+
+    const encodedId = crypto.encodeVoteId(data.id);
 
     const resultDTO: SingleVoteGetDTO = {
         voteId: encodedId as string,
@@ -206,8 +231,14 @@ const getSingleVote = async (voteId: string) => {
     return resultDTO;
 };
 
+/**
+ * get current single vote
+ *
+ * @param {string} voteId hashed vote id
+ */
 const getCurrentSingleVote = async (voteId: string) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     const data = await prisma.vote.findUnique({
         select: {
             id: true,
@@ -238,8 +269,9 @@ const getCurrentSingleVote = async (voteId: string) => {
         },
     });
 
-    if (!data) return null;
-    const encodedId=crypto.encodeVoteId(data.id);
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.GET_VOTE_FAIL);
+
+    const encodedId = crypto.encodeVoteId(data.id);
 
     const resultDTO: SingleVoteGetDTO = {
         voteId: encodedId as string,
@@ -293,13 +325,21 @@ const getCurrentSingleVote = async (voteId: string) => {
     return resultDTO;
 };
 
-const getCurrentVotes = async (userId: number, cursorId: number) => {
-    const isFirstPage = !cursorId;
+/**
+ * get current vote list
+ *
+ * @param {number} userId user unique id
+ * @param {string} cursorId hashed vote id
+ */
+const getCurrentVotes = async (userId: number, cursorId: string) => {
+    const isFirstPage = cursorId === "0" ? true : false;
+
+    const decodedId = +crypto.decodeVoteId(cursorId);
 
     const pageCondition = {
         skip: 1,
         cursor: {
-            id: cursorId as number,
+            id: decodedId,
         },
     };
 
@@ -330,8 +370,8 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
         ...(!isFirstPage && pageCondition),
     });
 
-    if (data.length == 0) return null;  
-    
+    if (data.length == 0) return null;
+
     const result: CurrentVotesGetDTO[] = data.map((value: any) => {
         let DTOs = {
             voteId: crypto.encodeVoteId(value.id) as string,
@@ -343,10 +383,16 @@ const getCurrentVotes = async (userId: number, cursorId: number) => {
         return DTOs;
     });
 
-    const resCursorId = data[data.length - 1].id;
+    const resCursorId = crypto.encodeVoteId(data[data.length - 1].id);
     return { result, resCursorId };
 };
 
+/**
+ * get library vote list - updown
+ *
+ * @param {number} userId user unique id
+ * @param {string} flag date number
+ */
 const getVoteLibrary = async (userId: number, flag: number) => {
     let dates = await prisma.vote.groupBy({
         by: ["date"],
@@ -418,8 +464,15 @@ const getVoteLibrary = async (userId: number, flag: number) => {
     return result;
 };
 
+/**
+ * get library vote list - updown
+ *
+ * @param {number} userId user unique id
+ * @param {number} date date number
+ * @param {string} flag hashed vote id
+ */
 const getVoteReminder = async (userId: number, date: number, flag: string) => {
-    const decodedId=crypto.decodeVoteId(flag);
+    const decodedId = crypto.decodeVoteId(flag);
 
     let voteData = await prisma.vote.findMany({
         where: {
@@ -464,11 +517,17 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
 };
 
 /*
-    플레이어
+   player
 */
 
+/**
+ * get current pictures in vote
+ *
+ * @param {string} voteId hashed vote id
+ */
 const playerGetPictures = async (voteId: string) => {
-    const decodedId=+crypto.decodeVoteId(voteId);
+    const decodedId = +crypto.decodeVoteId(voteId);
+
     const data = await prisma.vote.findFirst({
         select: {
             id: true,
@@ -494,9 +553,9 @@ const playerGetPictures = async (voteId: string) => {
         },
     });
 
-    if (!data) return null;
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.PLAYER_GET_VOTE_FAIL);
 
-    const encodedId=crypto.encodeVoteId(data.id);
+    const encodedId = crypto.encodeVoteId(data.id);
 
     const resultDTO: PlayerPicturesGetDTO = {
         userName: data?.User.user_name as string,
@@ -505,6 +564,10 @@ const playerGetPictures = async (voteId: string) => {
         voteTitle: data?.title as string,
         Picture: data?.Picture as object[],
     };
+
+    if (resultDTO.voteStatus == false)
+        throw new PicmeException(sc.BAD_REQUEST, false, rm.PLAYER_VOTE_ALREADY_END);
+
     return resultDTO;
 };
 
@@ -526,7 +589,8 @@ const playerGetVotedResult = async (pictureId: number) => {
             id: pictureId,
         },
     });
-    if (!data) return null;
+
+    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.PLAYER_GET_VOTE_FAIL);
 
     const resultDTO: PlayerGetVotedResultDTO = {
         Picture: {

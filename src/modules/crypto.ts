@@ -2,13 +2,28 @@ import CryptoJS from "crypto-js";
 import config from "../config";
 
 const encodeVoteId = (voteId: number) => {
-    const encodedId = CryptoJS.AES.encrypt(voteId.toString(), config.cryptoKey).toString();
-    return encodeURIComponent(encodedId.toString());
+    let encodedId = CryptoJS.AES.encrypt(voteId.toString(), config.cryptoKey).toString();
+
+    encodedId = encodedId
+        .replace(/\+/g, "p1L2u3S")
+        .replace(/\//g, "s1L2a3S4h")
+        .replace(/=/g, "e1Q2u3A4l")
+        .replace(/&/g, "ieklip34")
+        .replace(/%/g, "eir33r");
+
+    return encodedId;
 };
 
 const decodeVoteId = (encodedId: string) => {
-    const decodedId = decodeURIComponent(encodedId);
+    let decodedId = encodedId
+        .replace(/p1L2u3S/g, "+")
+        .replace(/s1L2a3S4h/g, "/")
+        .replace(/e1Q2u3A4l/g, "=")
+        .replace(/ieklip34/g, "&")
+        .replace(/eir33r/g, "%");
+
     const voteId = CryptoJS.AES.decrypt(decodedId, config.cryptoKey).toString(CryptoJS.enc.Utf8);
+
     return voteId;
 };
 

@@ -19,7 +19,7 @@ router.get("/library/:voteId", voteController.getSingleVote);
 // get current single vote result
 router.get("/:voteId", voteController.getCurrentSingleVote);
 
-// close current
+// close current vote
 router.patch("/:voteId", voteController.closeVote);
 
 // get library votes -> bottom infinite scroll

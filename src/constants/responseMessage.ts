@@ -70,6 +70,7 @@ export default {
     DELETE_VOTE_FAIL: "투표 삭제 실패",
     VOTE_USER_NOT_EQUAL: "투표 사용자의 투표가 아닙니다.",
     PLAYER_GET_VOTED_RESULT_SUCCESS: "투표와 스티커 가져오기를 성공 했습니다.",
+    CURRENT_DATA_END: "더이상 데이터가 없습니다.",
     LIBRARY_GET_SUCCESS: "라이브러리 조회 성공",
     LIBRARY_NO_DATA: "저장된 투표가 없습니다.",
     LIBRARY_GET_FAIL: "라이브러리 조회 실패",

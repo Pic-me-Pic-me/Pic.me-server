@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { authService, voteService } from "../service";
+import { voteService } from "../service";
 import { rm, sc } from "../constants";
-import { fail, success } from "../constants/response";
+import { success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
-import crypto from "../modules/crypto";
-import { nextTick } from "process";
+import { PicmeException } from "../models/PicmeException";
 
 /**
  * create vote
@@ -15,15 +14,14 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
-    if(!req.body.title)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!req.body.title) return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
 
     const locations = images.map((image: Express.MulterS3.File) => {
         return image.location;
     });
 
     if (locations.length != 2) {
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_TWO_PICTURES));
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.NOT_TWO_PICTURES));
     }
 
     const voteDTO: VoteCreateDTO = {
@@ -32,6 +30,7 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
         pictures: locations,
         count: 0,
     };
+
     try {
         const data = await voteService.createVote(+userId, voteDTO);
 
@@ -51,14 +50,14 @@ const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
 
     const userId = req.body.userId;
 
-    if (!userId) return res.status(sc.UNAUTHORIZED).send(fail(sc.UNAUTHORIZED, rm.INVALID_TOKEN));
+    if (!userId) return next(new PicmeException(sc.UNAUTHORIZED, false, rm.INVALID_TOKEN));
 
-    if (!voteId) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NOT_VOTE_ID));
+    if (!voteId) return next(new PicmeException(sc.BAD_REQUEST, false, rm.NOT_VOTE_ID));
 
     try {
-        const vote = await voteService.findVoteById(userId, voteId);
+        await voteService.findVoteById(userId, voteId);
 
-        const result = await voteService.deleteVote(voteId);
+        await voteService.deleteVote(voteId);
 
         return res.status(sc.OK).send(success(sc.OK, rm.DELETE_VOTE_SUCCESS));
     } catch (e) {
@@ -66,38 +65,64 @@ const deleteVote = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const getSingleVote = async (req: Request, res: Response) => {
+/**
+ * get single vote result in library
+ *
+ * @api {get} /library/:voteId
+ */
+const getSingleVote = async (req: Request, res: Response, next: NextFunction) => {
     const { voteId } = req.params;
-    const data = await voteService.getSingleVote(voteId);
 
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
+    try {
+        const data = await voteService.getSingleVote(voteId);
 
-    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+        return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
 };
 
-const getCurrentSingleVote = async (req: Request, res: Response) => {
+/**
+ * get current single vote result
+ *
+ * @api {get} /:voteId
+ */
+const getCurrentSingleVote = async (req: Request, res: Response, next: NextFunction) => {
     const { voteId } = req.params;
-    const data = await voteService.getCurrentSingleVote(voteId);
 
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.GET_VOTE_FAIL)); //여기
+    try {
+        const data = await voteService.getCurrentSingleVote(voteId);
 
-    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+        return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
 };
 
+/**
+ * get current vote list in main
+ *
+ * @api {get} /list/:cursorId
+ */
 const getCurrentVotes = async (req: Request, res: Response) => {
     const { cursorId } = req.params;
 
-    const data = await voteService.getCurrentVotes(+req.body.userId, +cursorId);
+    const data = await voteService.getCurrentVotes(+req.body.userId, cursorId);
 
-    if (!data) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NO_CURRENT_VOTE));
+    if (!data) return res.status(sc.OK).send(success(sc.OK, rm.CURRENT_DATA_END, []));
 
     return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
 };
 
-const getVoteLibrary = async (req: Request, res: Response) => {
+/**
+ * get library votes - bottom infinite scroll
+ *
+ * @api {get} /library/scroll/all
+ */
+const getVoteLibrary = async (req: Request, res: Response, next: NextFunction) => {
     const { flag } = req.query;
 
-    if (!flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!flag) return next(new PicmeException(sc.BAD_REQUEST, false, rm.NULL_VALUE));
 
     const data = await voteService.getVoteLibrary(req.body.userId, +flag);
 
@@ -105,10 +130,15 @@ const getVoteLibrary = async (req: Request, res: Response) => {
     else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
 };
 
-const getVoteReminder = async (req: Request, res: Response) => {
+/**
+ * get library votes - right infinite scroll
+ *
+ * @api {get} /library/scroll/month
+ */
+const getVoteReminder = async (req: Request, res: Response, next: NextFunction) => {
     const { date, flag } = req.query;
 
-    if (!date || !flag) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+    if (!date || !flag) return next(new PicmeException(sc.BAD_REQUEST, false, rm.NULL_VALUE));
 
     const data = await voteService.getVoteReminder(req.body.userId, +date, flag as string);
 
@@ -117,43 +147,60 @@ const getVoteReminder = async (req: Request, res: Response) => {
     return res.status(sc.OK).send(success(sc.OK, rm.INF_SCROLL_SUCCESS, data));
 };
 
-/*
- [ 플레이어 ]
-*/
-
-const playerGetPictures = async (req: Request, res: Response) => {
-    const { voteId } = req.params;
-    const data = await voteService.playerGetPictures(voteId);
-    if (!data)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
-    if (data.voteStatus == false)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_VOTE_ALREADY_END));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
-};
-
-const playerGetVotedResult = async (req: Request, res: Response) => {
-    const { pictureId } = req.params;
-
-    const data = await voteService.playerGetVotedResult(+pictureId);
-    if (!data)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.PLAYER_GET_VOTE_FAIL));
-
-    return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
-};
-
-const closeVote = async (req: Request, res: Response) => {
+/**
+ * close current vote
+ *
+ * @api {patch} /:voteId
+ */
+const closeVote = async (req: Request, res: Response, next: NextFunction) => {
     const { voteId } = req.params;
     const { userId } = req.body;
 
-    const result = await voteService.closeVote(voteId, userId);
-    if (!result) return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.CLOSE_VOTE_FAIL));
-    if (result == sc.UNAUTHORIZED)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.VOTE_NOT_ADMIN));
-    if (result == sc.BAD_REQUEST)
-        return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.ALREADY_CLOSED_VOTE));
+    try {
+        await voteService.closeVote(voteId, userId);
 
-    return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
+        return res.status(sc.OK).send(success(sc.OK, rm.CLOSE_VOTE_SUCCESS));
+    } catch (e) {
+        return next(e);
+    }
+};
+
+/*
+   player
+*/
+
+/**
+ * get current pictures in vote
+ *
+ * @api {get} /common/pictures/:voteId
+ */
+const playerGetPictures = async (req: Request, res: Response, next: NextFunction) => {
+    const { voteId } = req.params;
+
+    try {
+        const data = await voteService.playerGetPictures(voteId);
+
+        return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
+};
+
+/**
+ *  get current vote status
+ *
+ * @api {get} /common/:pictureId
+ */
+const playerGetVotedResult = async (req: Request, res: Response, next: NextFunction) => {
+    const { pictureId } = req.params;
+
+    try {
+        const data = await voteService.playerGetVotedResult(+pictureId);
+
+        return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTED_RESULT_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
 };
 
 const voteController = {
