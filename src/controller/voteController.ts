@@ -3,6 +3,7 @@ import { voteService } from "../service";
 import { rm, sc } from "../constants";
 import { success } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
+import { LibraryDTO } from "../interfaces/LibraryDTO";
 import { PicmeException } from "../models/PicmeException";
 
 /**
@@ -126,8 +127,13 @@ const getVoteLibrary = async (req: Request, res: Response, next: NextFunction) =
 
     const data = await voteService.getVoteLibrary(req.body.userId, +flag);
 
-    if (data.length == 0) return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, data));
-    else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, data));
+    const libraryDTO: LibraryDTO = {
+        dates: data,
+    };
+
+    if (data.length == 0)
+        return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_NO_DATA, libraryDTO));
+    else return res.status(sc.OK).send(success(sc.OK, rm.LIBRARY_GET_SUCCESS, libraryDTO));
 };
 
 /**

@@ -405,63 +405,23 @@ const getVoteLibrary = async (userId: number, flag: number) => {
         },
     });
 
-    if (dates.length == 0) return dates;
+    if (dates.length == 0) return [];
 
     if (flag == 0) {
         dates = dates.splice(0, 3);
     } else {
         const index = dates.findIndex((data) => data.date === flag);
+
         if (index == -1) return [];
+
         dates = dates.splice(index + 1, 3);
     }
 
-    const result: object[] = await Promise.all(
-        dates.map(async (value: any) => {
-            const voteData = await prisma.vote.findMany({
-                where: {
-                    date: value.date as number,
-                    user_id: userId,
-                    status: false,
-                },
-                select: {
-                    id: true,
-                    title: true,
-                    count: true,
-                    created_at: true,
-                    Picture: {
-                        select: {
-                            url: true,
-                        },
-                        orderBy: {
-                            count: "desc",
-                        },
-                    },
-                },
-                orderBy: {
-                    created_at: "desc",
-                },
-                take: 5,
-            });
+    const data = dates.map((data) => {
+        return data.date;
+    });
 
-            const resultDTO: GetAllLibraryResultDTO = {
-                date: value.date as number,
-                votes: voteData.map((value: any) => {
-                    let votesDTO = {
-                        id: crypto.encodeVoteId(value.id),
-                        title: value.title,
-                        count: value.count,
-                        url: value.Picture[0].url,
-                        createdAt: value.created_at,
-                    };
-                    return votesDTO;
-                }),
-            };
-
-            return resultDTO;
-        })
-    );
-
-    return result;
+    return data;
 };
 
 /**
