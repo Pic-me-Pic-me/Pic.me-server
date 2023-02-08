@@ -432,7 +432,16 @@ const getVoteLibrary = async (userId: number, flag: number) => {
  * @param {string} flag hashed vote id
  */
 const getVoteReminder = async (userId: number, date: number, flag: string) => {
-    const decodedId = crypto.decodeVoteId(flag);
+    const isFirstPage = flag === "0" ? true : false;
+
+    const decodedId = +crypto.decodeVoteId(flag);
+
+    const pageCondition = {
+        skip: 1,
+        cursor: {
+            id: +decodedId,
+        },
+    };
 
     let voteData = await prisma.vote.findMany({
         where: {
@@ -455,11 +464,10 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             },
         },
         orderBy: {
-            created_at: "desc",
+            created_at: "asc",
         },
         take: 5,
-        skip: 1,
-        cursor: { id: +decodedId },
+        ...(!isFirstPage && pageCondition),
     });
 
     const result = voteData.map((value: any) => {
