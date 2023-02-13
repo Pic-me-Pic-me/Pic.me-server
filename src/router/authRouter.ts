@@ -11,7 +11,7 @@ router.post(
         body("username").notEmpty(),
         body("email").notEmpty(),
         body("email").isEmail(),
-        body("password").isLength({ min: 10 }),
+        body("password").isLength({ min: 8 }),
     ],
     authController.createUser
 );
@@ -23,7 +23,7 @@ router.post(
         body("email").notEmpty(),
         body("email").isEmail(),
         body("password").notEmpty(),
-        body("password").isLength({ min: 10 }),
+        body("password").isLength({ min: 8 }),
     ],
     authController.signInUser
 );
