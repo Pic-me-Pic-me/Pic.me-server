@@ -36,6 +36,22 @@ const checkUserName = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 /**
+ * check if user's email is duplicated
+ *
+ * @api {POST} /user/email
+ */
+const checkEmail = async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    try {
+        await userService.checkEmail(email as string);
+        console.log(rm.UNIQUE_USER_EMAIL);
+        return res.status(sc.OK).send(success(sc.OK, rm.UNIQUE_USER_EMAIL));
+    } catch (e) {
+        return next(e);
+    }
+};
+
+/**
  * withdraw from picme
  *
  * @api {DELETE} /user
@@ -56,6 +72,7 @@ const userController = {
     getUserInfo,
     checkUserName,
     deleteUser,
+    checkEmail,
 };
 
 export default userController;

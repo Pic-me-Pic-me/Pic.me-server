@@ -36,7 +36,9 @@ export default {
     CANT_GET_USERINFO: "유저 아이디를 갖고올 수 없습니다.",
     GET_USER_INFO: "유저 정보 갖고오기 성공",
     UNIQUE_USER_NAME: "중복 검사 완료! 중복되는 이름이 없습니다. ",
+    UNIQUE_USER_EMAIL: "중복 검사 완료! 중복되는 이메일이 없습니다. ",
     USER_NAME_DUPLICATE: "중복된 아이디가 있습니다.",
+    USER_EMAIL_DUPLICATE: "중복된 이메일이 있습니다.",
 
     // token
     CREATE_TOKEN_SUCCESS: "토큰 재발급 성공",
