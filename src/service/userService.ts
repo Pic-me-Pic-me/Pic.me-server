@@ -51,6 +51,23 @@ const checkUserName = async (userName: string) => {
 };
 
 /**
+ * check whether if the email is in use
+ *
+ * @param {string} email requested userName
+ */
+const checkEmail = async (email: string) => {
+    const data = await prisma.user.findFirst({
+        where: {
+            email: email,
+        },
+    });
+
+    if (data) throw new PicmeException(sc.BAD_REQUEST, false, rm.USER_EMAIL_DUPLICATE);
+
+    if (!data) return sc.OK;
+};
+
+/**
  * withdraw from picme
  *
  * @param {number} userId unique user id
@@ -130,6 +147,7 @@ const userService = {
     getUserInfo,
     checkUserName,
     deleteUser,
+    checkEmail,
 };
 
 export default userService;

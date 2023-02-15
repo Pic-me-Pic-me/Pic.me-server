@@ -9,6 +9,9 @@ router.get("/", userController.getUserInfo);
 // check duplicate nickname
 router.get("/name", userController.checkUserName);
 
+// check duplicate email
+router.post("/email", userController.checkEmail);
+
 // withdraw from picme
 router.delete("/", userController.deleteUser);
 
