@@ -38,10 +38,10 @@ const checkUserName = async (req: Request, res: Response, next: NextFunction) =>
 /**
  * check if user's email is duplicated
  *
- * @api {POST} /user/email
+ * @api {GET} /user/email
  */
 const checkEmail = async (req: Request, res: Response, next: NextFunction) => {
-    const { email } = req.body;
+    const { email } = req.query;
     try {
         await userService.checkEmail(email as string);
         console.log(rm.UNIQUE_USER_EMAIL);

@@ -10,7 +10,7 @@ router.get("/", userController.getUserInfo);
 router.get("/name", userController.checkUserName);
 
 // check duplicate email
-router.post("/email", userController.checkEmail);
+router.get("/email", userController.checkEmail);
 
 // withdraw from picme
 router.delete("/", userController.deleteUser);
