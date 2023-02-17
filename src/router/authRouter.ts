@@ -49,7 +49,7 @@ router.post(
         body("uid").notEmpty(),
         body("socialType").notEmpty(),
         body("userName").notEmpty(),
-        body("email").notEmpty(),
+        body("email"),
     ],
     authController.createSocialUser
 );
