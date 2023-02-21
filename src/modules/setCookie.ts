@@ -4,6 +4,7 @@ const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    path: "/",
 };
 
 const setRefreshTokenCookie = (cookieValue: string) => {
