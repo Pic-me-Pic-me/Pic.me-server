@@ -2,9 +2,7 @@ import cookie, { CookieSerializeOptions } from "cookie";
 import config from "../config";
 
 const cookieOptions: CookieSerializeOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
+    sameSite: "none",
     domain: config.webDomain,
     path: "/",
 };
