@@ -11,6 +11,7 @@ import { JwtPayload } from "jsonwebtoken";
 import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
 import { PicmeException } from "../models/PicmeException";
+import setCookie from "../modules/setCookie";
 
 /**
  * sign up with pic.me authentication
@@ -34,9 +35,12 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
         const result = {
             id: data.id,
             userName: data.user_name,
-            refreshToken: data.refresh_token,
             accessToken,
         };
+
+        const cookieString = setCookie.setRefreshTokenCookie(data.refresh_token!);
+
+        res.setHeader("Set-Cookie", cookieString);
 
         return res.status(sc.CREATED).send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
     } catch (e) {
@@ -68,9 +72,12 @@ const signInUser = async (req: Request, res: Response, next: NextFunction) => {
         const result = {
             id: data,
             userName: user.user_name,
-            refreshToken: user.refresh_token,
             accessToken,
         };
+
+        const cookieString = setCookie.setRefreshTokenCookie(user.refresh_token!);
+
+        res.setHeader("Set-Cookie", cookieString);
 
         return res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
     } catch (e) {
@@ -105,8 +112,11 @@ const createSocialUser = async (req: Request, res: Response, next: NextFunction)
             id: data.id,
             userName: userName,
             accessToken: accessToken,
-            refreshToken: data.refresh_token,
         };
+
+        const cookieString = setCookie.setRefreshTokenCookie(data.refresh_token!);
+
+        res.setHeader("Set-Cookie", cookieString);
 
         return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
     } catch (e) {
@@ -178,8 +188,11 @@ const loginSocialUser = async (req: Request, res: Response, next: NextFunction) 
             id: updatedUser.id,
             user_name: updatedUser.user_name,
             accessToken: accessToken,
-            refreshToken: updatedUser.refresh_token,
         };
+
+        const cookieString = setCookie.setRefreshTokenCookie(updatedUser.refresh_token!);
+
+        res.setHeader("Set-Cookie", cookieString);
 
         return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
     } catch (e) {
@@ -199,7 +212,16 @@ const tokenRefresh = async (req: Request, res: Response, next: NextFunction) => 
         return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
     }
 
-    const tokenRefreshDto: tokenRefreshDTO = req.body;
+    const refreshToken = req.headers["set-cookie"]?.at(0);
+
+    if (!refreshToken) {
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    }
+
+    const tokenRefreshDto: tokenRefreshDTO = {
+        accessToken: req.body.accessToken,
+        refreshToken: refreshToken,
+    };
 
     //verify tokens
     const refreshDecoded = jwtHandler.verify(tokenRefreshDto.refreshToken);

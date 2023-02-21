@@ -29,11 +29,7 @@ router.post(
 );
 
 // refresh accessToken
-router.post(
-    "/token",
-    [body("refreshToken").notEmpty(), body("accessToken").notEmpty()],
-    authController.tokenRefresh
-);
+router.post("/token", [body("accessToken").notEmpty()], authController.tokenRefresh);
 
 // check kakao user
 router.post(
