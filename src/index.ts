@@ -3,13 +3,14 @@ import router from "./router";
 import cors from "cors";
 import auth from "./middlewares/auth";
 import errorHandler from "./middlewares/errorHandler";
+import config from "./config";
 
 const app = express();
 const PORT = 3000;
 
 app.use(
     cors({
-        origin: process.env.REACT_APP_URL,
+        origin: config.webURL,
         credentials: true,
     })
 );

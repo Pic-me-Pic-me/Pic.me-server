@@ -19,9 +19,12 @@ export default {
     s3SecretKey: process.env.S3_SECRET_KEY as string,
     bucketName: process.env.S3_BUCKET as string,
 
-    //auth
+    // auth
     jwtSecretKey: process.env.JWT_SECRET as string,
 
-    //
+    // crypto
     cryptoKey: process.env.CRYPTO_PRIVATE_KEY as string,
+
+    // frontend
+    webURL: process.env.REACT_APP_URL as string,
 };
