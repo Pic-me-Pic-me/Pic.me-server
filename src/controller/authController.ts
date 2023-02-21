@@ -186,7 +186,7 @@ const loginSocialUser = async (req: Request, res: Response, next: NextFunction) 
 
         const result = {
             id: updatedUser.id,
-            user_name: updatedUser.user_name,
+            userName: updatedUser.user_name,
             accessToken: accessToken,
         };
 
