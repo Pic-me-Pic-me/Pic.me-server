@@ -4,7 +4,7 @@ import config from "../config";
 const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "lax",
     domain: config.webDomain,
     path: "/",
 };
