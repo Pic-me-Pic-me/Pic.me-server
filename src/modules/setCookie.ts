@@ -6,6 +6,7 @@ const cookieOptions: CookieSerializeOptions = {
     secure: true,
     sameSite: "none",
     domain: config.webDomain,
+    path: "/",
 };
 
 const setRefreshTokenCookie = (cookieValue: string) => {
