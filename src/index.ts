@@ -9,7 +9,7 @@ const PORT = 3000;
 
 app.use(
     cors({
-        origin: true,
+        origin: process.env.REACT_APP_URL,
         credentials: true,
     })
 );
