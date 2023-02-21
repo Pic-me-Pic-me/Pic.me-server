@@ -3,6 +3,7 @@ import cookie, { CookieSerializeOptions } from "cookie";
 const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
 };
 
 const setRefreshTokenCookie = (cookieValue: string) => {
