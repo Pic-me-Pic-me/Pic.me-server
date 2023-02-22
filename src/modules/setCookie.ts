@@ -5,7 +5,7 @@ const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path: "/login",
+    path: "/",
     domain: config.webDomain,
 };
 
