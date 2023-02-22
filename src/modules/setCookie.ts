@@ -5,7 +5,8 @@ const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path: "/",
+    path: "/login",
+    domain: config.webDomain,
 };
 
 const setRefreshTokenCookie = (cookieValue: string) => {
