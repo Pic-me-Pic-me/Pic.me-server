@@ -1,4 +1,4 @@
-import cookie, { CookieSerializeOptions } from "cookie";
+import { CookieSerializeOptions } from "cookie";
 import config from "../config";
 
 const cookieOptions: CookieSerializeOptions = {
@@ -9,10 +9,6 @@ const cookieOptions: CookieSerializeOptions = {
     domain: config.webDomain,
 };
 
-const setRefreshTokenCookie = (cookieValue: string) => {
-    return cookie.serialize("refreshToken", cookieValue, cookieOptions);
-};
-
 export default {
-    setRefreshTokenCookie,
+    cookieOptions,
 };

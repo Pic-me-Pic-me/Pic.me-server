@@ -38,11 +38,10 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
             accessToken,
         };
 
-        const cookieString = setCookie.setRefreshTokenCookie(data.refresh_token!);
-
-        res.setHeader("Set-Cookie", cookieString);
-
-        return res.status(sc.CREATED).send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
+        return res
+            .cookie("refreshToken", data.refresh_token, setCookie.cookieOptions)
+            .status(sc.CREATED)
+            .send(success(sc.CREATED, rm.SIGNUP_SUCCESS, result));
     } catch (e) {
         return next(e);
     }
@@ -75,11 +74,10 @@ const signInUser = async (req: Request, res: Response, next: NextFunction) => {
             accessToken,
         };
 
-        const cookieString = setCookie.setRefreshTokenCookie(user.refresh_token!);
-
-        res.setHeader("Set-Cookie", cookieString);
-
-        return res.status(sc.OK).send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
+        return res
+            .cookie("refreshToken", user.refresh_token, setCookie.cookieOptions)
+            .status(sc.OK)
+            .send(success(sc.OK, rm.SIGNIN_SUCCESS, result));
     } catch (e) {
         return next(e);
     }
@@ -114,11 +112,10 @@ const createSocialUser = async (req: Request, res: Response, next: NextFunction)
             accessToken: accessToken,
         };
 
-        const cookieString = setCookie.setRefreshTokenCookie(data.refresh_token!);
-
-        res.setHeader("Set-Cookie", cookieString);
-
-        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
+        return res
+            .cookie("refreshToken", data.refresh_token, setCookie.cookieOptions)
+            .status(sc.OK)
+            .send(success(sc.OK, rm.SOCIAL_SIGNUP_SUCCESS, result));
     } catch (e) {
         return next(e);
     }
@@ -190,11 +187,10 @@ const loginSocialUser = async (req: Request, res: Response, next: NextFunction) 
             accessToken: accessToken,
         };
 
-        const cookieString = setCookie.setRefreshTokenCookie(updatedUser.refresh_token!);
-
-        res.setHeader("Set-Cookie", cookieString);
-
-        return res.status(sc.OK).send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
+        return res
+            .cookie("refreshToken", updatedUser.refresh_token, setCookie.cookieOptions)
+            .status(sc.OK)
+            .send(success(sc.OK, rm.SOCIAL_SIGNIN_SUCCESS, result));
     } catch (e) {
         return next(e);
     }
