@@ -6,7 +6,6 @@ const cookieOptions: CookieSerializeOptions = {
     secure: true,
     sameSite: "none",
     path: "/",
-    domain: config.webDomain,
 };
 
 export default {
