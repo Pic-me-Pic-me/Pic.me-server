@@ -1,5 +1,4 @@
-import { CookieSerializeOptions } from "cookie";
-import config from "../config";
+import cookie, { CookieSerializeOptions } from "cookie";
 
 const cookieOptions: CookieSerializeOptions = {
     httpOnly: true,
@@ -8,6 +7,9 @@ const cookieOptions: CookieSerializeOptions = {
     path: "/",
 };
 
+const setRefreshTokenCookie = (cookieValue: string) => {
+    return cookie.serialize("refreshToken", cookieValue, cookieOptions);
+};
 export default {
-    cookieOptions,
+    setRefreshTokenCookie,
 };
