@@ -7,7 +7,7 @@ const sign = (userId: number) => {
         userId,
     };
 
-    const accessToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "3m" });
+    const accessToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "2h" });
     return accessToken;
 };
 
@@ -16,7 +16,7 @@ const signRefresh = (userId: number) => {
         userId,
     };
 
-    const refreshToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "4m" });
+    const refreshToken = jwt.sign(payload, config.jwtSecretKey, { expiresIn: "14d" });
     return refreshToken;
 };
 
