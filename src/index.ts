@@ -10,7 +10,7 @@ const PORT = 3000;
 
 app.use(
     cors({
-        origin: config.webURL,
+        origin: [config.webURL, config.webLocal],
         credentials: true,
     })
 );
