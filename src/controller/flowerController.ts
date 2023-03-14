@@ -9,7 +9,17 @@ import { flowerService } from "../service";
  *
  * @api {get} /library/:voteId
  */
-const getSingleFlowerVote = async (req: Request, res: Response, next: NextFunction) => {};
+const getSingleFlowerVote = async (req: Request, res: Response, next: NextFunction) => {
+    const { voteId } = req.params;
+
+    try {
+        const data = await flowerService.getSingleVote(voteId);
+
+        return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
+    } catch (e) {
+        return next(e);
+    }
+};
 
 const flowerController = {
     getSingleFlowerVote,
