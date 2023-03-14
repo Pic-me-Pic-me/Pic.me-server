@@ -454,6 +454,7 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             title: true,
             count: true,
             created_at: true,
+            type: true,
             Picture: {
                 select: {
                     url: true,
@@ -477,6 +478,7 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             count: value.count,
             url: value.Picture[0].url,
             createdAt: value.created_at,
+            type: value.type,
         };
         return votesDTO;
     });
