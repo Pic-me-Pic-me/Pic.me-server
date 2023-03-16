@@ -30,6 +30,7 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
         status: true,
         pictures: locations,
         count: 0,
+        type: 1
     };
 
     try {
