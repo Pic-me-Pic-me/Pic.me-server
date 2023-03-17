@@ -67,6 +67,8 @@ export default {
     PLAYER_GET_VOTE_RESULT_FAIL: "투표 결과를 받아올 수 없습니다.",
     PLAYER_GET_VOTE_SUCCESS: "투표 결과를 갖고 왔습니다.",
     PLAYER_VOTE_ALREADY_END: "이미 투표가 끝났습니다.",
+    PLAYER_GET_VOTE_PICTURE_SUCCESS: "꽃 투표 관련 사진을 갖고 왔습니다",
+    PLAYER_GET_VOTE_PICTURE_FAIL: "꽃 투표 관련 사진을 갖고 올 수 없습니다.",
     NOT_VOTE_ID: "해당 투표 아이디가 존재하지 않습니다.",
     DELETE_VOTE_SUCCESS: "투표가 삭제되었습니다.",
     DELETE_VOTE_FAIL: "투표 삭제 실패",
