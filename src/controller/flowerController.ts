@@ -14,8 +14,8 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const images: Express.MulterS3.File = req.file as Express.MulterS3.File;
 
-    if (!req.body.title || !req.body.userId) return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
-
+    if (!req.body.userId) return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    
     let locations: string[]= [];
     locations.push(images.location);
     
@@ -24,7 +24,7 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const voteDTO: VoteCreateDTO = {
-        title: req.body.title,
+        title: "",
         status: true,
         pictures: locations,
         count: 0,
