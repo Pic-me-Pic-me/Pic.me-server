@@ -29,6 +29,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             count: 0,
             created_at: dayjs().add(9, "hour").format(),
             date: +dayjs().format("YYYYMM"),
+            type: voteDTO.type,
             Picture: {
                 create: [
                     { url: voteDTO.pictures[0], count: 0 },
