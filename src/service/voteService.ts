@@ -350,6 +350,7 @@ const getCurrentVotes = async (userId: number, cursorId: string) => {
             created_at: true,
             count: true,
             date: true,
+            type: true,
             Picture: {
                 select: {
                     url: true,
