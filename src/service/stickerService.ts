@@ -257,9 +257,7 @@ const flowerStickerPaste = async (FlowerStickerCreateDto: FlowerStickerCreateDTO
             } else {
                 let parsedCurrentLocation = JSON.parse(sticker.sticker_location as string);
 
-                FlowerStickerCreateDto.location.map((value: object) => {
-                    parsedCurrentLocation.push(value);
-                });
+                parsedCurrentLocation.push(FlowerStickerCreateDto.location);
 
                 let currentLocation = JSON.stringify(parsedCurrentLocation);
 
