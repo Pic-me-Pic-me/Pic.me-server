@@ -3,4 +3,5 @@ export interface VoteCreateDTO {
     status: boolean;
     pictures: string[];
     count: number;
+    type: number;
 }

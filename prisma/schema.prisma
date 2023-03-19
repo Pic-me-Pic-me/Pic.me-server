@@ -29,7 +29,7 @@ model Vote {
   Picture    Picture[]
   User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "vote_user_user_id_fk")
 }
-
+  
 model Picture {
   id      Int       @id @unique @default(autoincrement())
   vote_id Int
