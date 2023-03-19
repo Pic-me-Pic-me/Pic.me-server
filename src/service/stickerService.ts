@@ -233,6 +233,16 @@ const flowerStickerPaste = async (FlowerStickerCreateDto: FlowerStickerCreateDTO
 
     if (!picture) throw new PicmeException(sc.BAD_REQUEST, false, rm.PICTURE_NOT_EXIST);
 
+    const vote = await prisma.vote.findUnique({
+        where: {
+            id: picture?.vote_id,
+        },
+    });
+
+    if (!vote) throw new PicmeException(sc.BAD_REQUEST, false, rm.VOTE_NOT_EXIST);
+
+    if (vote.count == 10) throw new PicmeException(sc.BAD_REQUEST, false, rm.ALREADY_CLOSED_VOTE);
+
     try {
         const data = await prisma.$transaction(async (tx) => {
             const sticker = await findSticker(
@@ -292,6 +302,21 @@ const flowerStickerPaste = async (FlowerStickerCreateDto: FlowerStickerCreateDTO
                     },
                 },
             });
+
+            const updatedVote = await prisma.vote.findUnique({
+                where: {
+                    id: picture.vote_id,
+                },
+            });
+
+            if (updatedVote?.count == 10) {
+                await tx.vote.update({
+                    where: { id: updatedVote.id },
+                    data: {
+                        status: false,
+                    },
+                });
+            }
 
             return modifiedSticker.id;
         });
