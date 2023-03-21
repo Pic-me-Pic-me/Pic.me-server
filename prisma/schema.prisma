@@ -25,15 +25,17 @@ model Vote {
   count      Int
   created_at DateTime  @default(now())
   date       Int
+  type       Int?
   Picture    Picture[]
   User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "vote_user_user_id_fk")
 }
-
+  
 model Picture {
   id      Int       @id @unique @default(autoincrement())
   vote_id Int
   url     String    @db.VarChar(800)
   count   Int?
+  Keyword Keyword[]
   Vote    Vote      @relation(fields: [vote_id], references: [id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
   Sticker Sticker[]
 }
@@ -46,10 +48,22 @@ model AuthenticationProvider {
 }
 
 model Sticker {
-  id               Int     @id @default(autoincrement())
-  sticker_location String? @db.VarChar(100000)
+  id               Int       @id @default(autoincrement())
+  sticker_location String?   @db.VarChar(100000)
   picture_id       Int
   emoji            Int
   count            Int?
-  Picture          Picture @relation(fields: [picture_id], references: [id], onDelete: Cascade, map: "sticker_picture_id_fk")
+  type             Int?
+  Keyword          Keyword[]
+  Picture          Picture   @relation(fields: [picture_id], references: [id], onDelete: Cascade, map: "sticker_picture_id_fk")
+}
+
+model Keyword {
+  id         Int      @id @default(autoincrement())
+  sticker_id Int?
+  count      Int?
+  type       Int?
+  keyword    Int?
+  Picture    Picture? @relation(fields: [sticker_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "keyword_picture_id_fk")
+  Sticker    Sticker? @relation(fields: [sticker_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "keyword_sticker_id_fk")
 }

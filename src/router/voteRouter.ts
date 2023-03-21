@@ -5,7 +5,7 @@ import { upload, auth } from "../middlewares";
 const router: Router = Router();
 
 // post vote
-router.post("/", upload.array("file"), auth, voteController.createVote);
+router.post("/", auth, upload.array("file"), voteController.createVote);
 
 // get current vote list
 router.get("/list/:cursorId", voteController.getCurrentVotes);

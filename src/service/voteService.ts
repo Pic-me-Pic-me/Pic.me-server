@@ -29,6 +29,7 @@ const createVote = async (userId: number, voteDTO: VoteCreateDTO) => {
             count: 0,
             created_at: dayjs().add(9, "hour").format(),
             date: +dayjs().format("YYYYMM"),
+            type: voteDTO.type,
             Picture: {
                 create: [
                     { url: voteDTO.pictures[0], count: 0 },
@@ -350,6 +351,7 @@ const getCurrentVotes = async (userId: number, cursorId: string) => {
             created_at: true,
             count: true,
             date: true,
+            type: true,
             Picture: {
                 select: {
                     url: true,
@@ -454,6 +456,7 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             title: true,
             count: true,
             created_at: true,
+            type: true,
             Picture: {
                 select: {
                     url: true,
@@ -477,6 +480,7 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             count: value.count,
             url: value.Picture[0].url,
             createdAt: value.created_at,
+            type: value.type,
         };
         return votesDTO;
     });
