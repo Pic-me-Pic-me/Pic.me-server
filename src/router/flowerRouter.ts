@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { flowerController } from "../controller";
-import { upload } from "../middlewares";
+import { upload, auth } from "../middlewares";
 
 const router: Router = Router();
 
@@ -8,7 +8,7 @@ const router: Router = Router();
 router.get("/library/:voteId", flowerController.getSingleFlowerVote);
 
 // post flower vote
-router.post("/", upload.single("file"), flowerController.createVote);
+router.post("/", upload.single("file"), auth, flowerController.createVote);
 
 /*
  플레이어
