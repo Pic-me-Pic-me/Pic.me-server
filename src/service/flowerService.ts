@@ -180,6 +180,7 @@ const playerGetFlowerVotePicture = async (voteId: string) => {
         select: {
             id: true,
             status: true,
+            type: true,
             Picture: {
                 select: {
                     id: true,
@@ -199,6 +200,7 @@ const playerGetFlowerVotePicture = async (voteId: string) => {
     const resultDTO: FlowerPlayerPictureGetDto = {
         voteId: encodedId as string,
         voteStatus: data.status as boolean,
+        type: data.type as number,
         Picture: data.Picture as object,
     };
 
