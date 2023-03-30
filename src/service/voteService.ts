@@ -551,6 +551,7 @@ const playerGetVotedResult = async (pictureId: number) => {
             id: true,
             url: true,
             count: true,
+            vote_id: true,
             Sticker: {
                 select: {
                     sticker_location: true,
@@ -561,6 +562,15 @@ const playerGetVotedResult = async (pictureId: number) => {
         },
         where: {
             id: pictureId,
+        },
+    });
+
+    const voteType = await prisma.vote.findFirst({
+        select: {
+            type: true,
+        },
+        where: {
+            id: data?.vote_id,
         },
     });
 
@@ -580,6 +590,7 @@ const playerGetVotedResult = async (pictureId: number) => {
             };
             return DTOs;
         }),
+        type: voteType?.type as number,
     };
     return resultDTO;
 };
