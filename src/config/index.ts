@@ -27,6 +27,7 @@ export default {
 
     // frontend
     webURL: process.env.REACT_APP_URL as string,
+    webFlowerURL: process.env.REACT_APP_FLOWER_URL as string,
     webDomain: process.env.REACT_APP_DOMAIN as string,
     webLocal: process.env.REACT_APP_LOCALHOST as string,
 };
