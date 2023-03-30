@@ -505,6 +505,7 @@ const playerGetPictures = async (voteId: string) => {
             id: true,
             status: true,
             title: true,
+            type: true,
             Picture: {
                 select: {
                     id: true,
@@ -535,6 +536,7 @@ const playerGetPictures = async (voteId: string) => {
         voteStatus: data?.status as boolean,
         voteTitle: data?.title as string,
         Picture: data?.Picture as object[],
+        type: data?.type as number,
     };
 
     if (resultDTO.voteStatus == false)

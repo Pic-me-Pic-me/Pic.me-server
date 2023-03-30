@@ -4,4 +4,5 @@ export interface PlayerPicturesGetDTO {
     voteStatus: boolean;
     voteTitle: string;
     Picture: object[];
+    type: number;
 }
