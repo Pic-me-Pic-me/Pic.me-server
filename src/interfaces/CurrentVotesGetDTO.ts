@@ -4,4 +4,5 @@ export interface CurrentVotesGetDTO {
     voteThumbnail: string;
     createdAt: string;
     totalVoteCount: number;
+    type: number;
 }

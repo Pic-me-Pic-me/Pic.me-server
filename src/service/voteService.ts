@@ -381,6 +381,7 @@ const getCurrentVotes = async (userId: number, cursorId: string) => {
             voteThumbnail: value.Picture[0]?.url as string,
             createdAt: value.created_at as string,
             totalVoteCount: value.count as number,
+            type: value.type as number,
         };
         return DTOs;
     });
