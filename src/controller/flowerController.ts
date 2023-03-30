@@ -25,7 +25,7 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const voteDTO: VoteCreateDTO = {
-        title: "",
+        title: "나를 닮은 꽃은?",
         status: true,
         pictures: locations,
         count: 0,
