@@ -294,7 +294,7 @@ const flowerStickerPaste = async (FlowerStickerCreateDto: FlowerStickerCreateDTO
                 },
             });
 
-            await tx.vote.update({
+            const updatedVote = await tx.vote.update({
                 where: { id: picture.vote_id },
                 data: {
                     count: {
@@ -303,13 +303,7 @@ const flowerStickerPaste = async (FlowerStickerCreateDto: FlowerStickerCreateDTO
                 },
             });
 
-            const updatedVote = await prisma.vote.findUnique({
-                where: {
-                    id: picture.vote_id,
-                },
-            });
-
-            if (updatedVote?.count == 10) {
+            if (updatedVote.count == 10) {
                 await tx.vote.update({
                     where: { id: updatedVote.id },
                     data: {
