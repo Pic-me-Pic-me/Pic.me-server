@@ -106,23 +106,39 @@ const deleteUser = async (userId: number) => {
                             },
                         });
 
-                        const firstImgUrl = picture[0].url;
-                        const secondImgUrl = picture[1].url;
+                        let firstImgUrl;
+                        let secondImgUrl;
 
-                        urls.push(
-                            {
+                        if (picture.length == 2) {
+                            firstImgUrl = picture[0].url;
+                            secondImgUrl = picture[1].url;
+
+                            urls.push(
+                                {
+                                    Key: firstImgUrl.substring(
+                                        firstImgUrl.lastIndexOf("/") + 1,
+                                        firstImgUrl.length
+                                    ),
+                                },
+                                {
+                                    Key: secondImgUrl.substring(
+                                        secondImgUrl.lastIndexOf("/") + 1,
+                                        secondImgUrl.length
+                                    ),
+                                }
+                            );
+                        }
+
+                        if (picture.length == 1) {
+                            const firstImgUrl = picture[0].url;
+
+                            urls.push({
                                 Key: firstImgUrl.substring(
                                     firstImgUrl.lastIndexOf("/") + 1,
                                     firstImgUrl.length
                                 ),
-                            },
-                            {
-                                Key: secondImgUrl.substring(
-                                    secondImgUrl.lastIndexOf("/") + 1,
-                                    secondImgUrl.length
-                                ),
-                            }
-                        );
+                            });
+                        }
                     })
                 );
 
