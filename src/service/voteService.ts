@@ -468,7 +468,7 @@ const getVoteReminder = async (userId: number, date: number, flag: string) => {
             },
         },
         orderBy: {
-            created_at: "asc",
+            created_at: "desc",
         },
         take: 5,
         ...(!isFirstPage && pageCondition),
