@@ -1,4 +1,4 @@
 export interface ClosedVoteResponseDTO {
-    title: string;
+    voteTitle: string;
     type: number;
 }

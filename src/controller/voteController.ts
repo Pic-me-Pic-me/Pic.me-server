@@ -192,7 +192,7 @@ const playerGetPictures = async (req: Request, res: Response, next: NextFunction
         if (!data.voteStatus) {
             const closedVoteResponseDTO: ClosedVoteResponseDTO = {
                 type: data.type,
-                title: data.voteTitle,
+                voteTitle: data.voteTitle,
             };
 
             return res
