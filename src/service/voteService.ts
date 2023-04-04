@@ -540,15 +540,6 @@ const playerGetPictures = async (voteId: string) => {
         type: data?.type as number,
     };
 
-    if (resultDTO.voteStatus == false) {
-        if (resultDTO.type == 1) {
-            throw new PicmeException(sc.BAD_REQUEST, false, rm.PLAYER_ORIGIN_VOTE_ALREADY_END);
-        }
-
-        if (resultDTO.type == 2) {
-            throw new PicmeException(sc.BAD_REQUEST, false, rm.PLAYER_FLOWER_VOTE_ALREADY_END);
-        }
-    }
     return resultDTO;
 };
 

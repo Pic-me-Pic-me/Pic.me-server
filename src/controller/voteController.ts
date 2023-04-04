@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { voteService } from "../service";
 import { rm, sc } from "../constants";
-import { success } from "../constants/response";
+import { success, failWithData } from "../constants/response";
 import { VoteCreateDTO } from "../interfaces/VoteCreateDTO";
+import { ClosedVoteResponseDTO } from "../interfaces/ClosedVoteResponseDTO";
 import { LibraryDTO } from "../interfaces/LibraryDTO";
 import { PicmeException } from "../models/PicmeException";
 
@@ -15,7 +16,8 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.body;
     const images: Express.MulterS3.File[] = req.files as Express.MulterS3.File[];
 
-    if (!req.body.title || !req.body.userId) return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
+    if (!req.body.title || !req.body.userId)
+        return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
 
     const locations = images.map((image: Express.MulterS3.File) => {
         return image.location;
@@ -30,7 +32,7 @@ const createVote = async (req: Request, res: Response, next: NextFunction) => {
         status: true,
         pictures: locations,
         count: 0,
-        type: 1
+        type: 1,
     };
 
     try {
@@ -186,6 +188,19 @@ const playerGetPictures = async (req: Request, res: Response, next: NextFunction
 
     try {
         const data = await voteService.playerGetPictures(voteId);
+
+        if (!data.voteStatus) {
+            const closedVoteResponseDTO: ClosedVoteResponseDTO = {
+                type: data.type,
+                title: data.voteTitle,
+            };
+
+            return res
+                .status(sc.BAD_REQUEST)
+                .send(
+                    failWithData(sc.BAD_REQUEST, rm.PLAYER_VOTE_ALREADY_END, closedVoteResponseDTO)
+                );
+        }
 
         return res.status(sc.OK).send(success(sc.OK, rm.PLAYER_GET_VOTE_SUCCESS, data));
     } catch (e) {
