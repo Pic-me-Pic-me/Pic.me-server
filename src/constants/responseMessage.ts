@@ -94,4 +94,9 @@ export default {
 
     // transaction fail
     TRANSACTION_FAILED: "트랜잭션 실패",
+
+    //alarm
+    PUSH_NOTIFICATION_SUCCESS: "알람 전송 성공",
+    PUSH_NOTIFICATION_FALED: "알람 전송 실패",
+    PUSH_NOTIFICATION_REGISTER_FALED: "유저 구독 실패",
 };
