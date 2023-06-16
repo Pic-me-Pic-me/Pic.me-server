@@ -13,6 +13,9 @@ model User {
   email                  String?                  @db.VarChar(500)
   password               String?                  @db.VarChar(500)
   refresh_token          String?                  @db.VarChar(500)
+  web_token              String?                  @db.VarChar(500)
+  public_key             String?                  @db.VarChar(500)
+  secret_key             String?                  @db.VarChar(300)
   AuthenticationProvider AuthenticationProvider[]
   Vote                   Vote[]
 }
@@ -29,13 +32,12 @@ model Vote {
   Picture    Picture[]
   User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "vote_user_user_id_fk")
 }
-  
+
 model Picture {
   id      Int       @id @unique @default(autoincrement())
   vote_id Int
   url     String    @db.VarChar(800)
   count   Int?
-  Keyword Keyword[]
   Vote    Vote      @relation(fields: [vote_id], references: [id], onDelete: Cascade, map: "picture_vote_vote_id_fk")
   Sticker Sticker[]
 }
@@ -64,6 +66,5 @@ model Keyword {
   count      Int?
   type       Int?
   keyword    Int?
-  Picture    Picture? @relation(fields: [sticker_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "keyword_picture_id_fk")
-  Sticker    Sticker? @relation(fields: [sticker_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "keyword_sticker_id_fk")
+  Picture    Sticker? @relation(fields: [sticker_id], references: [id], onDelete: Cascade, map: "keyword_picture_id_fk")
 }
