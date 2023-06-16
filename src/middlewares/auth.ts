@@ -5,7 +5,7 @@ import { fail } from "../constants/response";
 import tokenType from "../constants/tokenType";
 import jwtHandler from "../modules/jwtHandler";
 
-const skipAuthPath = ["/sticker", "/auth", "/user/name", "/user/email", "/vote/common"];
+const skipAuthPath = ["/sticker", "/auth", "/user/name", "/user/email", "/vote/common", "/alarm"];
 const uploadPath = "/vote";
 
 export default async (req: Request, res: Response, next: NextFunction) => {
