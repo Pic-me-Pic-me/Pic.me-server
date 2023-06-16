@@ -30,4 +30,9 @@ export default {
     webFlowerURL: process.env.REACT_APP_FLOWER_URL as string,
     webDomain: process.env.REACT_APP_DOMAIN as string,
     webLocal: process.env.REACT_APP_LOCALHOST as string,
+
+    // web-push
+    webPushPublicKey: process.env.WEB_PUSH_PUBLIC_KEY as string,
+    webPushPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY as string,
+    webPushSubject: process.env.WEB_PUSH_SUBJECT as string,
 };
