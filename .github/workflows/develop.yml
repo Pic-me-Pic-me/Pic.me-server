@@ -37,6 +37,13 @@ jobs:
                   yarn
                   yarn run build
 
+            # update prisma
+            - name: prisma
+              working-directory: ./
+              run: |
+                  sudo yarn run db-pull:dev
+                  sudo yarn run generate:dev
+
             # compress to zip file to upload to S3
             - name: compress files for deploy
               run: zip -r picme.zip ./dist ./scripts ./appspec.yml ./.env.development ./package.json ./prisma

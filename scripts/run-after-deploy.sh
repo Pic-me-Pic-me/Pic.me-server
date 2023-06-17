@@ -20,7 +20,5 @@ fi
 
 if [ "$DEPLOYMENT_GROUP_NAME" == "testDeployGroup" ]
 then
-    sudo yarn run db-pull:dev
-    sudo yarn run generate:dev
     sudo yarn run deploy:dev
 fi
