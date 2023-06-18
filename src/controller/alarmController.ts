@@ -42,12 +42,16 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         return next(new PicmeException(sc.BAD_REQUEST, false, rm.BAD_REQUEST));
     }
 
+    const userId = req.body.userId;
+
+    if (!userId) return next(new PicmeException(sc.UNAUTHORIZED, false, rm.INVALID_TOKEN));
+
     const alarmRegisterDTO: AlarmRegisterDTO = req.body;
 
     try {
         await alarmService.register(alarmRegisterDTO);
 
-        return res.status(sc.OK).send(success(sc.OK, rm.PUSH_NOTIFICATION_SUCCESS));
+        return res.status(sc.OK).send(success(sc.OK, rm.PUSH_NOTIFICATION_REGISTER_SUCCESS));
     } catch (e) {
         return next(e);
     }

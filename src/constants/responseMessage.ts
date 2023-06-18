@@ -98,5 +98,6 @@ export default {
     //alarm
     PUSH_NOTIFICATION_SUCCESS: "알람 전송 성공",
     PUSH_NOTIFICATION_FALED: "알람 전송 실패",
+    PUSH_NOTIFICATION_REGISTER_SUCCESS: "유저 구독 성공",
     PUSH_NOTIFICATION_REGISTER_FALED: "유저 구독 실패",
 };

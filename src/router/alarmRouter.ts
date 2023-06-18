@@ -14,7 +14,7 @@ router.post(
 //register notification
 router.post(
     "/register",
-    [body("userId").notEmpty(), body("endpoint").notEmpty(), body("keys").notEmpty()],
+    [body("endpoint").notEmpty(), body("expirationTime"), body("keys").notEmpty()],
     alarmController.register
 );
 
