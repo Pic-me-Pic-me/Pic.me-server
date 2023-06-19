@@ -1,5 +1,5 @@
 export interface AlarmPushDTO {
-    userId: number;
+    userList: number[];
     title: string;
     message: string;
 }

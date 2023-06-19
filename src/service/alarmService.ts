@@ -20,34 +20,24 @@ const prisma = new PrismaClient();
  * @param {string} message message to send
  */
 const push = async (alarmPushDTO: AlarmPushDTO) => {
-    const { userId, title, message } = alarmPushDTO;
+    const { userList, title, message } = alarmPushDTO;
 
-    const data = await prisma.user.findUnique({
+    const userKeyList = await prisma.user.findMany({
         select: {
             web_token: true,
             secret_key: true,
             public_key: true,
         },
         where: {
-            id: userId,
+            id: { in: userList },
         },
     });
 
-    if (!data) throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_USER);
-
-    //one to one, if null -> error, one to many -> if null, pass and register again
+    if (!userKeyList) throw new PicmeException(sc.BAD_REQUEST, false, rm.NO_USER);
 
     const alarmPayload: AlarmPayloadDTO = {
         title: title,
         body: message,
-    };
-
-    const userPayload: AlarmUserPayloadDTO = {
-        endpoint: data.web_token!,
-        keys: {
-            p256dh: data.public_key!,
-            auth: data.secret_key!,
-        },
     };
 
     const options = {
@@ -55,7 +45,17 @@ const push = async (alarmPushDTO: AlarmPushDTO) => {
     };
 
     try {
-        webpush.sendNotification(userPayload, JSON.stringify(alarmPayload), options);
+        userKeyList.forEach((userKey) => {
+            console.log(userKey.web_token);
+            const userPayload: AlarmUserPayloadDTO = {
+                endpoint: userKey.web_token!,
+                keys: {
+                    p256dh: userKey.public_key!,
+                    auth: userKey.secret_key!,
+                },
+            };
+            webpush.sendNotification(userPayload, JSON.stringify(alarmPayload), options);
+        });
 
         return;
     } catch (e) {

@@ -7,7 +7,7 @@ const router: Router = Router();
 //push notification
 router.post(
     "/push",
-    [body("userId").notEmpty(), body("title").notEmpty(), body("message").notEmpty()],
+    [body("userList").notEmpty(), body("title").notEmpty(), body("message").notEmpty()],
     alarmController.push
 );
 
