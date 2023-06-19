@@ -6,11 +6,11 @@ import errorHandler from "./middlewares/errorHandler";
 import config from "./config";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(
     cors({
-        origin: [config.webURL, config.webLocal, config.webFlowerURL],
+        origin: [config.webURL, config.webLocal, config.webFlowerURL, config.webPushURL],
         credentials: true,
     })
 );

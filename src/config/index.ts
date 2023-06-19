@@ -35,4 +35,5 @@ export default {
     webPushPublicKey: process.env.WEB_PUSH_PUBLIC_KEY as string,
     webPushPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY as string,
     webPushSubject: process.env.WEB_PUSH_SUBJECT as string,
+    webPushURL: process.env.WEB_PUSH_TEST_URL as string,
 };
